@@ -1,9 +1,9 @@
 ﻿using Autodesk.DesignScript.Geometry;
 using DynamoServices;
-using Iteris.Civil.Dynamo.Support;
+using IterisCivilDynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace Iteris.Civil.Dynamo.Alignments
+namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
     /// Данные об отрезке трассы
@@ -41,7 +41,7 @@ namespace Iteris.Civil.Dynamo.Alignments
             Direction = ReflectionSupport.GetProperty(line, "Direction", double.NaN);
             _midPoint = PointData.FromPointObject
                 (ReflectionSupport.GetProperty(line, "MidPoint", null));
-            Length = StartPoint.DistanceTo(EndPoint);
+            Length = _startPoint.DistanceTo(_endPoint);
         }
     }
 }

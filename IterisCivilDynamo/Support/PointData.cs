@@ -1,7 +1,8 @@
 ﻿using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
+using System;
 
-namespace Iteris.Civil.Dynamo.Support
+namespace IterisCivilDynamo.Support
 {
     /// <summary>
     /// Data for point coordinates
@@ -78,6 +79,19 @@ namespace Iteris.Civil.Dynamo.Support
             && !double.IsNaN(Y)
             && !double.IsNaN(Z)
             ? Point.ByCoordinates(X, Y, Z)
-            : null;        
+            : null; 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public double DistanceTo(PointData other)
+        {
+            return Math.Sqrt
+                (Math.Pow(other.X - X, 2)
+                + Math.Pow(other.Y - Y, 2)
+                + Math.Pow(other.Z - Z, 2));
+        }
     }
 }

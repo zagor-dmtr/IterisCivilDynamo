@@ -7,27 +7,31 @@ using Autodesk.Civil.DynamoNodes;
 using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
 using DynamoServices;
+using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using AcApplication = Autodesk.AutoCAD.ApplicationServices.Application;
-using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 using AeccProfileView = Autodesk.Civil.DatabaseServices.ProfileView;
+using IterisAlignment = IterisCivilDynamo.Alignments.Alignment;
+using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 
-namespace Iteris.Civil.Dynamo.ProfileViews
+namespace IterisCivilDynamo.ProfileViews
 {
     /// <summary>
     /// Данные о виде профиля
     /// </summary>
     [RegisterForTrace]
-    public class ProfileView : CivilObject
+    public sealed class ProfileView : CivilObject
     {
-        Alignment _alignment;
+        private readonly ObjectId AlignmentId;
 
-        internal AeccProfileView AeccProfileView => AcObject as AeccProfileView;
+        internal AeccProfileView AeccProfileView => AcObject as AeccProfileView;       
 
-        internal ProfileView(AeccProfileView pView, bool isDynamoOwned)
-            : base(pView, isDynamoOwned) { }
+        internal ProfileView(AeccProfileView pView, bool isDynamoOwned = false)
+            : base(pView, isDynamoOwned)
+        {
+            AlignmentId = pView.AlignmentId;
+        }
 
         /// <summary>
         /// Текущий коэффициент масштабирования анннотаций вида профиля
@@ -51,16 +55,7 @@ namespace Iteris.Civil.Dynamo.ProfileViews
         /// <summary>
         /// Трасса вида профиля
         /// </summary>
-        public Alignment Alignment
-        {
-            get
-            {
-                Document document = Document.Current;
-                return _alignment ??
-                    (_alignment = Selection.Alignments(document).FirstOrDefault
-                    (item => item.Name.Equals(AeccProfileView.AlignmentName)));
-            }
-        }
+        public IterisAlignment Alignment => IterisAlignment.Get(AlignmentId);
 
         /// <summary>
         /// Выбор вида профиля на чертеже
@@ -86,14 +81,14 @@ namespace Iteris.Civil.Dynamo.ProfileViews
         /// </summary>
         /// <param name="alignment"></param>
         /// <returns></returns>
-        public static IList<ProfileView> GetProfileViews(Alignment alignment)
+        public static IList<ProfileView> GetProfileViews(IterisAlignment alignment)
         {
             if (alignment is null) throw new ArgumentNullException("Alignment is null!");
 
-            IList<ProfileView> ret = new List<ProfileView>();
-            AeccAlignment align = alignment.InternalDBObject as AeccAlignment;
+            IList<ProfileView> ret = new List<ProfileView>();           
 
-            ObjectIdCollection pViewIds = align.GetProfileViewIds();
+            ObjectIdCollection pViewIds
+                = alignment.AeccAlignment.GetProfileViewIds();
 
             foreach (ObjectId pViewId in pViewIds)
             {
@@ -101,8 +96,9 @@ namespace Iteris.Civil.Dynamo.ProfileViews
                     || pViewId.IsErased
                     || pViewId.IsEffectivelyErased) continue;
 
-                ProfileView pView = Get(pViewId);
-                pView._alignment = alignment;
+                ProfileView pView = CivilObjectSupport
+                    .Get<ProfileView, AeccProfileView>
+                    (pViewId, (pV) => new ProfileView(pV));               
                 ret.Add(pView);
             }
 

@@ -1,7 +1,7 @@
 ﻿using DynamoServices;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace Iteris.Civil.Dynamo.Alignments
+namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
     /// Данные о кривой трассы типа спираль-дуга-спираль

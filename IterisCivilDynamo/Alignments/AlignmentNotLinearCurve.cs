@@ -1,29 +1,30 @@
-﻿using DynamoServices;
-using Iteris.Civil.Dynamo.Support;
+﻿using Autodesk.DesignScript.Runtime;
+using DynamoServices;
+using IterisCivilDynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace Iteris.Civil.Dynamo.Alignments
+namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
     /// Базовый объект для не прямолинейной кривой трассы
     /// </summary>
-    [RegisterForTrace]
+    [IsVisibleInDynamoLibrary(false)]
     public abstract class AlignmentNotLinearCurve : AlignmentCurve
     {
         /// <summary>
         /// Направление в начале
         /// </summary>
-        public double StartDirection { get; private set; }
+        public virtual double StartDirection { get; private set; }
 
         /// <summary>
         /// Направление в конце
         /// </summary>
-        public double EndDirection { get; private set; }
+        public virtual double EndDirection { get; private set; }
 
         /// <summary>
         /// Gets or sets the AlignmentNotLinearCurve's delta
         /// </summary>
-        public double Delta { get; private set; }
+        public virtual double Delta { get; private set; }
 
         internal AlignmentNotLinearCurve(C3dDb.AlignmentCurve curve) : base(curve)
         {

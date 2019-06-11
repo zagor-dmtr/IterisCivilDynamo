@@ -7,7 +7,7 @@
     <ProjectGuid>{F3443DAC-2DED-417B-865C-348A88BFE1A3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Iteris.Civil.Dynamo</RootNamespace>
+    <RootNamespace>IterisCivilDynamo</RootNamespace>
     <AssemblyName>IterisCivilDynamo</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -89,8 +89,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alignments\Alignment.cs" />
     <Compile Include="Alignments\AlignmentExtension.cs" />
-    <Compile Include="Alignments\AlignmentAnyCurve.cs" />
     <Compile Include="Alignments\AlignmentArc.cs" />
     <Compile Include="Alignments\AlignmentCurve.cs" />
     <Compile Include="Alignments\AlignmentLine.cs" />
@@ -99,6 +99,7 @@
     <Compile Include="Alignments\AlignmentSpiral.cs" />
     <Compile Include="ProfileViews\ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Support\CivilObjectSupport.cs" />
     <Compile Include="Support\PointData.cs" />
     <Compile Include="Support\ReflectionSupport.cs" />
   </ItemGroup>

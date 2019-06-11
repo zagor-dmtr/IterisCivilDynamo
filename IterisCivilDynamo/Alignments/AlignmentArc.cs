@@ -1,15 +1,15 @@
 ﻿using Autodesk.DesignScript.Geometry;
 using DynamoServices;
-using Iteris.Civil.Dynamo.Support;
+using IterisCivilDynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace Iteris.Civil.Dynamo.Alignments
+namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
     /// Данные о дуге трассы
     /// </summary>
     [RegisterForTrace]
-    public class AlignmentArc : AlignmentNotLinearCurve
+    public sealed class AlignmentArc : AlignmentNotLinearCurve
     {
         private PointData _centerPoint;
         private readonly PointData _pIPoint;
@@ -83,6 +83,21 @@ namespace Iteris.Civil.Dynamo.Alignments
         /// Gets a bool value that specifies whether the curve entity is a reverse curve.
         /// </summary>
         public bool ReverseCurve { get; private set; }
+
+        /// <summary>
+        /// Direction in start
+        /// </summary>
+        public override double StartDirection => base.StartDirection;
+
+        /// <summary>
+        /// Deirection in end
+        /// </summary>
+        public override double EndDirection => base.EndDirection;
+
+        /// <summary>
+        /// Gets the AlignmentCurve's delta
+        /// </summary>
+        public override double Delta => base.Delta;
 
         internal AlignmentArc(C3dDb.AlignmentArc arc) : base(arc)
         {

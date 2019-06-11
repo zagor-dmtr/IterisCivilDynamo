@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace Iteris.Civil.Dynamo.Support
+namespace IterisCivilDynamo.Support
 {
     /// <summary>
     /// Support methods for use reflection
@@ -24,7 +24,10 @@ namespace Iteris.Civil.Dynamo.Support
             try
             {
                 return curveObjType?
-                    .GetProperty(propertyName, BindingFlags.IgnoreCase)?
+                    .GetProperty(propertyName,
+                    BindingFlags.IgnoreCase
+                    | BindingFlags.Public
+                    | BindingFlags.Instance)?
                     .GetValue(obj) ?? defaultValue;
             }
             catch
@@ -47,7 +50,11 @@ namespace Iteris.Civil.Dynamo.Support
             try
             {
                 return
-                    (T)(curveObjType?.GetProperty(propertyName, BindingFlags.IgnoreCase)?
+                    (T)(curveObjType?.GetProperty
+                    (propertyName,
+                    BindingFlags.IgnoreCase
+                    | BindingFlags.Public
+                    | BindingFlags.Instance)?
                     .GetValue(obj) ?? defaultValue);
             }
             catch

@@ -1,10 +1,10 @@
 ﻿using Autodesk.DesignScript.Geometry;
 using DynamoServices;
-using Iteris.Civil.Dynamo.Support;
+using IterisCivilDynamo.Support;
 using C3d = Autodesk.Civil;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace Iteris.Civil.Dynamo.Alignments
+namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
     /// Alignment spirale data
@@ -103,6 +103,21 @@ namespace Iteris.Civil.Dynamo.Alignments
         /// Gets the AlignmentSpiral entity SPI station.
         /// </summary>
         public double SPIStation { get; private set; }
+
+        /// <summary>
+        /// Direction in start
+        /// </summary>
+        public override double StartDirection => base.StartDirection;
+
+        /// <summary>
+        /// Deirection in end
+        /// </summary>
+        public override double EndDirection => base.EndDirection;
+
+        /// <summary>
+        /// Gets the AlignmentCurve's delta
+        /// </summary>
+        public override double Delta => base.Delta;
 
         internal AlignmentSpiral(C3dDb.AlignmentSpiral spiral)
             : base(spiral)

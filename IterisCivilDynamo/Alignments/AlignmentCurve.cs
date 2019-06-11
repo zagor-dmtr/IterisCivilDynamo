@@ -1,15 +1,17 @@
 ﻿using Autodesk.DesignScript.Geometry;
-using Iteris.Civil.Dynamo.Support;
+using DynamoServices;
+using IterisCivilDynamo.Support;
 using System;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace Iteris.Civil.Dynamo.Alignments
+namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
     /// Базовый объект для всех типов кривых,
     /// из которых может состоять трасса
     /// </summary>
-    public abstract class AlignmentCurve
+    [RegisterForTrace]
+    public class AlignmentCurve
     {
         private int entityAfter;
         private int entityBefore;
@@ -17,7 +19,14 @@ namespace Iteris.Civil.Dynamo.Alignments
         private double highestDesignSpeed;
         private int subEntityCount;
 
-        private PointData _startPoint, _endPoint;
+        /// <summary>
+        /// 
+        /// </summary>
+        protected PointData _startPoint;
+        /// <summary>
+        /// 
+        /// </summary>
+        protected PointData _endPoint;
 
         /// <summary>
         /// Начальная точка кривой
@@ -138,7 +147,7 @@ namespace Iteris.Civil.Dynamo.Alignments
         /// </summary>
         public bool IsSubEntity { get; }
 
-        private AlignmentCurve(object curve)
+        internal AlignmentCurve(object curve)
         {
             SetProps(curve);
         }
