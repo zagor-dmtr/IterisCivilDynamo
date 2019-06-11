@@ -2,15 +2,13 @@
 using Autodesk.AutoCAD.DynamoApp.Services;
 using Autodesk.AutoCAD.DynamoNodes;
 using Autodesk.Civil.DynamoNodes;
+using Autodesk.DesignScript.Runtime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AeccEntity = Autodesk.Civil.DatabaseServices.Entity;
 
 namespace IterisCivilDynamo.Support
 {
+    [IsVisibleInDynamoLibrary(false)]
     internal static class CivilObjectSupport
     {
         public static T Get<T, U>(ObjectId id, Func<U,T> creator)

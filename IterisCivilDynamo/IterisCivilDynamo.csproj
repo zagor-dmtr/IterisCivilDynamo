@@ -97,6 +97,7 @@
     <Compile Include="Alignments\AlignmentNotLinearCurve.cs" />
     <Compile Include="Alignments\AlignmentSCS.cs" />
     <Compile Include="Alignments\AlignmentSpiral.cs" />
+    <Compile Include="Drawings\Drawing.cs" />
     <Compile Include="ProfileViews\ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\CivilObjectSupport.cs" />

@@ -8,7 +8,7 @@ namespace IterisCivilDynamo.Support
     /// Support methods for use reflection
     /// </summary>
     [IsVisibleInDynamoLibrary(false)]
-    public static class ReflectionSupport
+    internal static class ReflectionSupport
     {
         /// <summary>
         /// Get property from object

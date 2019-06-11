@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using AcApplication = Autodesk.AutoCAD.ApplicationServices.Application;
 using AeccProfileView = Autodesk.Civil.DatabaseServices.ProfileView;
 using IterisAlignment = IterisCivilDynamo.Alignments.Alignment;
-using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 
 namespace IterisCivilDynamo.ProfileViews
 {
@@ -32,13 +31,7 @@ namespace IterisCivilDynamo.ProfileViews
         {
             AlignmentId = pView.AlignmentId;
         }
-
-        /// <summary>
-        /// Текущий коэффициент масштабирования анннотаций вида профиля
-        /// </summary>
-        public static double CurrentScaleFactor
-            => 1 / (double)AcApplication.GetSystemVariable("cannoscalevalue");
-
+        
         /// <summary>
         /// Положение точки вставки вида профиля
         /// </summary>
