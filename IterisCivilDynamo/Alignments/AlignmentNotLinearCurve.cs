@@ -1,8 +1,8 @@
 ﻿using DynamoServices;
-using Iteris.Dynamo.Support;
+using Iteris.Civil.Dynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace IterisAlignment
+namespace Iteris.Civil.Dynamo.Alignments
 {
     /// <summary>
     /// Базовый объект для не прямолинейной кривой трассы

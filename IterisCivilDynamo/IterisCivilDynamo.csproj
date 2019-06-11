@@ -7,8 +7,8 @@
     <ProjectGuid>{F3443DAC-2DED-417B-865C-348A88BFE1A3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IterisAlignment</RootNamespace>
-    <AssemblyName>IterisAlignment</AssemblyName>
+    <RootNamespace>Iteris.Civil.Dynamo</RootNamespace>
+    <AssemblyName>IterisCivilDynamo</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -21,7 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\IterisAlignment.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\IterisCivilDynamo.xml</DocumentationFile>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <DocumentationFile>bin\Release\IterisCivilDynamo.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCoreMgd">
@@ -86,21 +89,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlignmentExtension.cs" />
-    <Compile Include="AlignmentAnyCurve.cs" />
-    <Compile Include="AlignmentArc.cs" />
-    <Compile Include="AlignmentCurve.cs" />
-    <Compile Include="AlignmentLine.cs" />
-    <Compile Include="AlignmentNotLinearCurve.cs" />
-    <Compile Include="AlignmentSCS.cs" />
-    <Compile Include="AlignmentSpiral.cs" />
+    <Compile Include="Alignments\AlignmentExtension.cs" />
+    <Compile Include="Alignments\AlignmentAnyCurve.cs" />
+    <Compile Include="Alignments\AlignmentArc.cs" />
+    <Compile Include="Alignments\AlignmentCurve.cs" />
+    <Compile Include="Alignments\AlignmentLine.cs" />
+    <Compile Include="Alignments\AlignmentNotLinearCurve.cs" />
+    <Compile Include="Alignments\AlignmentSCS.cs" />
+    <Compile Include="Alignments\AlignmentSpiral.cs" />
+    <Compile Include="ProfileViews\ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Support\PointData.cs" />
+    <Compile Include="Support\ReflectionSupport.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IterisDynamoSupport\IterisDynamoSupport.csproj">
-      <Project>{ccd9f7f3-9751-40b8-88bf-abc114a48928}</Project>
-      <Name>IterisDynamoSupport</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

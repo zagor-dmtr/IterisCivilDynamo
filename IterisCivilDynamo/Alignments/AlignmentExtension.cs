@@ -12,7 +12,7 @@ using System.Linq;
 using C3dAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace IterisAlignment
+namespace Iteris.Civil.Dynamo.Alignments
 {
     /// <summary>
     /// Методы для работы с трассами

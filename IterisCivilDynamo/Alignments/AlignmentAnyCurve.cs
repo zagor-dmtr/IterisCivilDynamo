@@ -1,7 +1,7 @@
 ﻿using DynamoServices;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
-namespace IterisAlignment
+namespace Iteris.Civil.Dynamo.Alignments
 {
     /// <summary>
     /// Данные о кривой трассы не добавленного в библиотеку типа

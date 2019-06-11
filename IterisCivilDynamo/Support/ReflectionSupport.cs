@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace Iteris.Dynamo.Support
+namespace Iteris.Civil.Dynamo.Support
 {
     /// <summary>
     /// Support methods for use reflection

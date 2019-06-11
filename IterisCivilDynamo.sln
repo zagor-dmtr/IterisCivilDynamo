@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IterisProfileView", "IterisProfileView\IterisProfileView.csproj", "{B11EC813-026C-4B82-8307-5B862B552FD0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IterisDynamoSupport", "IterisDynamoSupport\IterisDynamoSupport.csproj", "{CCD9F7F3-9751-40B8-88BF-ABC114A48928}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IterisCivilDynamo", "IterisCivilDynamo\IterisCivilDynamo.csproj", "{F3443DAC-2DED-417B-865C-348A88BFE1A3}"
 EndProject
 Global
@@ -15,14 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B11EC813-026C-4B82-8307-5B862B552FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B11EC813-026C-4B82-8307-5B862B552FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B11EC813-026C-4B82-8307-5B862B552FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B11EC813-026C-4B82-8307-5B862B552FD0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCD9F7F3-9751-40B8-88BF-ABC114A48928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCD9F7F3-9751-40B8-88BF-ABC114A48928}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCD9F7F3-9751-40B8-88BF-ABC114A48928}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCD9F7F3-9751-40B8-88BF-ABC114A48928}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3443DAC-2DED-417B-865C-348A88BFE1A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3443DAC-2DED-417B-865C-348A88BFE1A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3443DAC-2DED-417B-865C-348A88BFE1A3}.Release|Any CPU.ActiveCfg = Release|Any CPU

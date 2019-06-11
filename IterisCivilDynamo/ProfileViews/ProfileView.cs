@@ -14,7 +14,7 @@ using AcApplication = Autodesk.AutoCAD.ApplicationServices.Application;
 using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 using AeccProfileView = Autodesk.Civil.DatabaseServices.ProfileView;
 
-namespace IterisProfileView
+namespace Iteris.Civil.Dynamo.ProfileViews
 {
     /// <summary>
     /// Данные о виде профиля

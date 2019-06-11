@@ -1,7 +1,7 @@
 ﻿using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
 
-namespace Iteris.Dynamo.Support
+namespace Iteris.Civil.Dynamo.Support
 {
     /// <summary>
     /// Data for point coordinates
