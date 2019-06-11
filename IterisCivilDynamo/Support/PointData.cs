@@ -8,7 +8,7 @@ namespace IterisCivilDynamo.Support
     /// Data for point coordinates
     /// </summary>
     [IsVisibleInDynamoLibrary(false)]
-    public struct PointData
+    internal struct PointData
     {
         /// <summary>
         /// Coordinate X
@@ -55,7 +55,9 @@ namespace IterisCivilDynamo.Support
         /// <summary>
         /// Create data from object with double properties: x and y or x, y and z
         /// </summary>
-        /// <param name="point2dOr3d">Object with double properties: x and y or x, y and z</param>
+        /// <param name="point2dOr3d">
+        /// Object with double properties: x and y or x, y and z
+        /// </param>
         /// <returns></returns>
         /// <remarks>
         /// Object "point3d" have to has two or tree double

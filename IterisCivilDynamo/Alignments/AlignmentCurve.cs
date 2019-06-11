@@ -18,15 +18,10 @@ namespace IterisCivilDynamo.Alignments
         private int entityId;
         private double highestDesignSpeed;
         private int subEntityCount;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected PointData _startPoint;
-        /// <summary>
-        /// 
-        /// </summary>
-        protected PointData _endPoint;
+        
+        private protected PointData _startPoint;
+       
+        private protected PointData _endPoint;
 
         /// <summary>
         /// Начальная точка кривой
