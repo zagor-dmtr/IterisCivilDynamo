@@ -1,6 +1,4 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.DynamoApp.Services;
-using Autodesk.AutoCAD.DynamoNodes;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.Civil.DynamoNodes;
@@ -11,47 +9,90 @@ using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
 using AcApplication = Autodesk.AutoCAD.ApplicationServices.Application;
-using AeccProfileView = Autodesk.Civil.DatabaseServices.ProfileView;
-using IterisAlignment = IterisCivilDynamo.Alignments.Alignment;
+using AlignmentNode = IterisCivilDynamo.Alignments.Alignment;
+using C3dProfileView = Autodesk.Civil.DatabaseServices.ProfileView;
 
 namespace IterisCivilDynamo.ProfileViews
 {
     /// <summary>
-    /// Данные о виде профиля
+    /// Profile view data
     /// </summary>
     [RegisterForTrace]
     public sealed class ProfileView : CivilObject
     {
         private readonly ObjectId AlignmentId;
 
-        internal AeccProfileView AeccProfileView => AcObject as AeccProfileView;       
+        internal C3dProfileView PView => AcObject as C3dProfileView;       
 
-        internal ProfileView(AeccProfileView pView, bool isDynamoOwned = false)
+        internal ProfileView(C3dProfileView pView, bool isDynamoOwned = false)
             : base(pView, isDynamoOwned)
         {
             AlignmentId = pView.AlignmentId;
+            AlignmentName = pView.AlignmentName;
         }
-        
+
         /// <summary>
-        /// Положение точки вставки вида профиля
+        /// Gets the location of the profile view.
         /// </summary>
         public Point Location
         {
             get
             {
-                Point3d location = AeccProfileView.Location;
+                Point3d location = PView.Location;
                 return Point.ByCoordinates
                     (location.X, location.Y, location.Z);
             }
         }
 
         /// <summary>
-        /// Трасса вида профиля
+        /// Gets the minimum elevation of the profile view.
         /// </summary>
-        public IterisAlignment Alignment => IterisAlignment.Get(AlignmentId);
+        public double ElevationMin => PView.ElevationMin;
 
         /// <summary>
-        /// Выбор вида профиля на чертеже
+        /// Gets the maximum elevation of the profile view.
+        /// </summary>
+        public double ElevationMax => PView.ElevationMax;
+
+        /// <summary>
+        /// Gets the start station of the profile view.
+        /// </summary>
+        public double StationStart => PView.StationStart;
+
+        /// <summary>
+        /// Gets the end station of the profile view.
+        /// </summary>
+        public double StationEnd => PView.StationEnd;
+
+        /// <summary>
+        /// Gets or sets the ProfileView's style by name.
+        /// </summary>
+        public string StyleName
+        {
+            get => PView.StyleName;
+            set => PView.StyleName = value;
+        }
+
+        /// <summary>
+        /// Gets the alignment from which the profile view was created.
+        /// </summary>
+        public AlignmentNode Alignment => AlignmentNode.Get(AlignmentId);
+
+        /// <summary>
+        /// Gets the name of the alignment from which the profile view was created.
+        /// </summary>
+        public string AlignmentName { get; }
+
+        /// <summary>
+        /// Gets how to specify the vertical range of the profile view.
+        /// </summary>
+        /// <remarks>
+        /// Automatic or UserSpecified
+        /// </remarks>
+        public string ElevationRangeMode => PView.ElevationRangeMode.ToString();
+
+        /// <summary>
+        /// Select a profile view on drawing
         /// </summary>        
         /// <returns></returns>
         public static ProfileView SelectOnDwg()
@@ -62,7 +103,7 @@ namespace IterisCivilDynamo.ProfileViews
             PromptEntityOptions selOpt
                 = new PromptEntityOptions("\nSelect a profile view:");
             selOpt.SetRejectMessage("\nIt's not a profile view!");
-            selOpt.AddAllowedClass(typeof(AeccProfileView), true);
+            selOpt.AddAllowedClass(typeof(C3dProfileView), true);
             PromptEntityResult selRes = ed.GetEntity(selOpt);
             if (selRes.Status != PromptStatus.OK) return null;
 
@@ -70,11 +111,11 @@ namespace IterisCivilDynamo.ProfileViews
         }
 
         /// <summary>
-        /// Получение всех видов профилей трассы
+        /// Gets all the alignment's profile views
         /// </summary>
         /// <param name="alignment"></param>
         /// <returns></returns>
-        public static IList<ProfileView> GetProfileViews(IterisAlignment alignment)
+        public static IList<ProfileView> GetProfileViews(AlignmentNode alignment)
         {
             if (alignment is null) throw new ArgumentNullException("Alignment is null!");
 
@@ -89,9 +130,7 @@ namespace IterisCivilDynamo.ProfileViews
                     || pViewId.IsErased
                     || pViewId.IsEffectivelyErased) continue;
 
-                ProfileView pView = CivilObjectSupport
-                    .Get<ProfileView, AeccProfileView>
-                    (pViewId, (pV) => new ProfileView(pV));               
+                ProfileView pView = Get(pViewId);               
                 ret.Add(pView);
             }
 
@@ -113,7 +152,7 @@ namespace IterisCivilDynamo.ProfileViews
         {
             double x = 0.0, y = 0.0;
             bool isOn
-                = AeccProfileView.FindXYAtStationAndElevation
+                = PView.FindXYAtStationAndElevation
                 (station, elevation, ref x, ref y);
 
             return new Dictionary<string, object>
@@ -139,7 +178,7 @@ namespace IterisCivilDynamo.ProfileViews
         {
             double station = 0.0, elevation = 0.0;
             bool isOn
-                = AeccProfileView.FindStationAndElevationAtXY
+                = PView.FindStationAndElevationAtXY
                 (x, y, ref station, ref elevation);
             return new Dictionary<string, object>
             {
@@ -150,14 +189,8 @@ namespace IterisCivilDynamo.ProfileViews
         }
 
         static ProfileView Get(ObjectId pViewId)
-        {
-            Document document = Document.Current;
-            using (DocumentContext context = new DocumentContext(document.AcDocument))
-            {
-                AeccProfileView pView = context.Transaction
-                    .GetObject(pViewId, OpenMode.ForWrite) as AeccProfileView;
-                return new ProfileView(pView, false);
-            }
-        }
+            => CivilObjectSupport
+            .Get<ProfileView, C3dProfileView>
+            (pViewId, (pV) => new ProfileView(pV));
     }
 }

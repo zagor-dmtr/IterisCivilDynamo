@@ -11,6 +11,7 @@ using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
 using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
+using AcPoint2d = Autodesk.AutoCAD.Geometry.Point2d;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Alignments
@@ -25,6 +26,173 @@ namespace IterisCivilDynamo.Alignments
 
         internal Alignment(AeccAlignment alignment, bool isDynamoOwned = false)
             : base(alignment, isDynamoOwned) { }
+
+        /// <summary>
+        /// Gets the alignment type.
+        /// </summary>
+        /// <value>
+        /// Centerline
+        /// Offset
+        /// CurbReturn
+        /// Utility
+        /// Rail
+        /// </value>
+        public string AlignmentType => AeccAlignment.AlignmentType.ToString();
+
+        /// <summary>
+        /// Gets the Alignment creation mode.
+        /// </summary>
+        /// <value>
+        /// RuleBasedCreation or ManuallyCreation
+        /// </value>
+        public string CreationMode => AeccAlignment.CreationMode.ToString();
+
+        /// <summary>
+        /// Gets or sets the criteria file name for the current alignment.
+        /// </summary>
+        /// <remarks>
+        /// The critertia file must keep consistent between the offset alignment and parent alignment.
+        /// </remarks>
+        public string CriteriaFileName
+        {
+            get => AeccAlignment.CriteriaFileName;
+            set => AeccAlignment.CriteriaFileName = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of of design check set that is used in the alignment.
+        /// </summary>
+        /// <remarks>
+        /// Return "" when there is no design check set applied in the current alignment.
+        /// </remarks>
+        public string DesignCheckSetName
+        {
+            get => AeccAlignment.DesignCheckSetName;
+            set => AeccAlignment.DesignCheckSetName = value;
+        }
+
+        /// <summary>
+        /// Gets the Alignment's start station.
+        /// </summary>
+        public double StartingStation => AeccAlignment.StartingStation;
+
+        /// <summary>
+        /// Gets the Alignment's end station.
+        /// </summary>
+        public double EndingStation => AeccAlignment.EndingStation;
+
+        /// <summary>
+        /// Gets the Alignment's end station with equations.
+        /// </summary>
+        public double EndingStationWithEquations => AeccAlignment.EndingStationWithEquations;
+
+        /// <summary>
+        /// Gets whether this Alignment has a Roundabout.
+        /// </summary>
+        public bool HasRoundabout => AeccAlignment.HasRoundabout;
+
+        /// <summary>
+        /// Gets whether this Alignment is a connected alignment.
+        /// </summary>
+        public bool IsConnectedAlignment => AeccAlignment.IsConnectedAlignment;
+
+        /// <summary>
+        /// Gets whether this alignment is an offset alignment.
+        /// </summary>
+        public bool IsOffsetAlignment => AeccAlignment.IsOffsetAlignment;
+
+        /// <summary>
+        /// Gets a bool value that indicates whether this Alignment is a siteless Alignment.
+        /// </summary>
+        public bool IsSiteless => AeccAlignment.IsSiteless;
+
+        /// <summary>
+        /// Gets the Alignment's length.
+        /// </summary>
+        public double Length => AeccAlignment.Length;
+
+        /// <summary>
+        /// Gets or sets the Alignment reference point.
+        /// </summary>
+        public Point ReferencePoint
+        {
+            get => PointData.FromPointObject(AeccAlignment.ReferencePoint).CreateDynamoPoint();
+            set => AeccAlignment.ReferencePoint = new AcPoint2d(value.X, value.Y);
+        }
+
+        /// <summary>
+        /// Gets or sets the Alignment reference point station.
+        /// </summary>
+        public double ReferencePointStation
+        {
+            get => AeccAlignment.ReferencePointStation;
+            set => AeccAlignment.ReferencePointStation = value;
+        }
+
+        /// <summary>
+        /// Gets the name of the Site to which this Alignment belongs. a string of "" for a siteless alignment.
+        /// </summary>
+        public string SiteName => AeccAlignment.SiteName;
+
+        /// <summary>
+        /// Gets or sets the Alignment station index increment.
+        /// </summary>
+        public double StationIndexIncrement
+        {
+            get => AeccAlignment.StationIndexIncrement;
+            set => AeccAlignment.StationIndexIncrement = value;
+        }
+
+        /// <summary>
+        /// Get or sets the Alignment's style name.
+        /// </summary>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown when the style name is invalid.
+        /// </exception>
+        public string StyleName
+        {
+            get => AeccAlignment.StyleName;            
+            set => AeccAlignment.StyleName = value;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the Alignment uses the design check set.
+        /// </summary>
+        public bool UseDesignCheckSet
+        {
+            get => AeccAlignment.UseDesignCheckSet;
+            set => AeccAlignment.UseDesignCheckSet = value;
+        }
+
+        /// <summary>
+        /// Gets or sets whether the alignment uses the design criteria file.
+        /// </summary>
+        public bool UseDesignCriteriaFile
+        {
+            get => AeccAlignment.UseDesignCriteriaFile;
+            set => AeccAlignment.UseDesignCriteriaFile = value;
+        }
+
+        /// <summary>
+        /// Gets or sets a bool value that indicates whether this Alignment uses degign speed.
+        /// </summary>
+        public bool UseDesignSpeed
+        {
+            get => AeccAlignment.UseDesignSpeed;
+            set => AeccAlignment.UseDesignSpeed = value;
+        }
+
+        /// <summary>
+        /// Copies the Alignment to a specified Site. Specifying "" to move it to siteless.
+        /// Calling this method copies all children profiles, profile views and sample line
+        /// group with this alignment as well.
+        /// </summary>
+        /// <param name="siteName">The destination site name.</param>
+        /// <exception cref="System.ArgumentException">Thrown when the Site name is invalid.</exception>
+        public void CopyToSite(string siteName)
+        {
+            AeccAlignment.CopyToSite(siteName);
+        }
 
         /// <summary>
         /// Получение данных о кривых, из которых состоит трасса
