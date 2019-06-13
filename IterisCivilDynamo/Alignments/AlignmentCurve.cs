@@ -7,8 +7,9 @@ using C3dDb = Autodesk.Civil.DatabaseServices;
 namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
-    /// Базовый объект для всех типов кривых,
-    /// из которых может состоять трасса
+    /// The AlignmentCurve class. This is an abstract base class
+    /// for other Alignment Entity classes, such as AlignmentArc,
+    /// AlignmentSCS, and AlignmentLine.
     /// </summary>
     [RegisterForTrace]
     public class AlignmentCurve
@@ -24,37 +25,47 @@ namespace IterisCivilDynamo.Alignments
         private protected PointData _endPoint;
 
         /// <summary>
-        /// Начальная точка кривой
+        /// Gets the AlignmentCurve constraint type, either Fixed, Float or Free.
+        /// </summary>
+        public string ConstraintType { get; private set; }
+
+        /// <summary>
+        /// Gets the start point of the AlignmentCurve.
         /// </summary>
         public Point StartPoint => _startPoint.CreateDynamoPoint();
 
         /// <summary>
-        /// Конечная точка кривой
+        /// Gets the end point of the AlignmentCurve.
         /// </summary>
         public Point EndPoint => _endPoint.CreateDynamoPoint();
 
         /// <summary>
-        /// Начальный пикет аж кривой
+        /// Gets the start station of the AlignmentCurve.
         /// </summary>
         public double StartStation { get; private set; }
 
         /// <summary>
-        /// Конечный пикетаж кривой
+        /// Gets the end station of the AlignmentCurve.
         /// </summary>
         public double EndStation { get; private set; }
 
         /// <summary>
-        /// Длина кривой
+        /// Gets the length of the AlignmentCurve.
         /// </summary>
         public double Length { get; protected set; }
 
         /// <summary>
-        /// Тип кривой
+        /// Gets the AlignmentCurve type: Line, Arc, Spiral, SpiralCurveSpiral,
+        /// SpiralLineSpiral, SpiralLine, LineSpiral, SpiralCurve, CurveSpiral,
+        /// SpiralSpiralCurveSpiralSpiral, SpiralCurveSpiralCurveSpiral,
+        /// SpiralCurveSpiralSpiralCurveSpiral, SpiralSpiral, SpiralSpiralCurve,
+        /// CurveSpiralSpiral, MultipleSegments, CurveLineCurve, CurveReverseCurve,
+        /// CurveCurveReverseCurve
         /// </summary>
         public string Type { get; private set; }
 
         /// <summary>
-        /// Уникальный номер кривой внутри трассы
+        /// Gets the AlignmentEntity id, which is the unique representation of this alignment entity.
         /// </summary>
         public int EntityId
         {
@@ -68,9 +79,8 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Номер следующей кривой внутри трассы.
-        /// Если -1 - следующая кривая отсутствует,
-        /// то есть кривая находится в конце трассы
+        /// Gets the ID of the AlignmentEntity after this one.
+        /// If the value is -1, the curve is in end of the alignment.
         /// </summary>
         public int EntityAfter
         {
@@ -84,9 +94,8 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Номер предыдущей кривой внутри трассы.
-        /// Если -1 - предыдущая кривая отсутствует,
-        /// то есть кривая находится в начале трассы
+        /// Gets the ID of the AlignmentEntity before this one.
+        /// If the value is -1, the curve is in start of the alignment.
         /// </summary>
         public int EntityBefore
         {
@@ -100,7 +109,7 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Максимальная проектная скорость на кривой
+        /// Gets the highest design speed of the AlignmentCurve.
         /// </summary>
         public double HighestDesignSpeed
         {
@@ -114,7 +123,7 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Количество вложенных кривых - для сложных участков
+        /// Gets the number of subentities that make up the AlignmentCurve.
         /// </summary>
         public int SubEntityCount
         {
@@ -138,7 +147,7 @@ namespace IterisCivilDynamo.Alignments
         public string CurveGroupSubEntityIndex { get; private set; }
 
         /// <summary>
-        /// Является ли кривая вложенной в другую кривую
+        /// Alignment curve is subentity
         /// </summary>
         public bool IsSubEntity { get; }
 
@@ -146,12 +155,8 @@ namespace IterisCivilDynamo.Alignments
         {
             SetProps(curve);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="curve"></param>
-        protected AlignmentCurve(C3dDb.AlignmentCurve curve) : this(curve as object)
+        
+        protected private AlignmentCurve(C3dDb.AlignmentCurve curve) : this(curve as object)
         {
             IsSubEntity = false;
             Type = ReflectionSupport.GetProperty
@@ -163,24 +168,18 @@ namespace IterisCivilDynamo.Alignments
                 (curve, "HighestDesignSpeed", double.NaN);
             SubEntityCount = ReflectionSupport.GetProperty(curve, "SubEntityCount", 0);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="subEntity"></param>
-        protected AlignmentCurve(C3dDb.AlignmentSubEntity subEntity) : this(subEntity as object)
+       
+        protected private AlignmentCurve(C3dDb.AlignmentSubEntity subEntity) : this(subEntity as object)
         {
             IsSubEntity = true;
             Type = ReflectionSupport.GetProperty
                 (subEntity, "SubEntityType", (object)"NO_TYPE").ToString();
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="entityObject"></param>
-        protected virtual void SetProps(object entityObject)
+        
+        protected private virtual void SetProps(object entityObject)
         {
+            ConstraintType = ReflectionSupport.GetProperty
+                (entityObject, "Constraint1", (object)"NO_TYPE").ToString();
             _startPoint = PointData.FromPointObject
                 (ReflectionSupport.GetProperty(entityObject, "StartPoint", null));
             _endPoint = PointData.FromPointObject
@@ -196,6 +195,10 @@ namespace IterisCivilDynamo.Alignments
             CurveGroupSubEntityIndex = ReflectionSupport.GetProperty
                 (entityObject, "CurveGroupSubEntityIndex", string.Empty);
         }
+
+        private protected string GetConstraint2(object obj)
+            => ReflectionSupport.GetProperty
+                (obj, "Constraint2", (object)"NO_TYPE").ToString();
 
         private void CheckForSubEntity(string propName)
         {

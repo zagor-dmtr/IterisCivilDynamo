@@ -23,5 +23,13 @@ namespace IterisCivilDynamo.Support
                 return creator(aeccObject);
             }
         }
+
+        public static void CheckForReference(AeccEntity entity)
+        {
+            if (entity.IsReferenceObject || entity.IsReferenceSubObject)
+            {
+                throw new InvalidOperationException("Object is referenced and cannot be changed!");
+            }
+        }
     }
 }

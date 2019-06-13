@@ -90,12 +90,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alignments\Alignment.cs" />
-    <Compile Include="Alignments\AlignmentExtension.cs" />
     <Compile Include="Alignments\AlignmentArc.cs" />
+    <Compile Include="Alignments\AlignmentCCRC.cs" />
+    <Compile Include="Alignments\AlignmentCRC.cs" />
     <Compile Include="Alignments\AlignmentCurve.cs" />
     <Compile Include="Alignments\AlignmentLine.cs" />
     <Compile Include="Alignments\AlignmentNotLinearCurve.cs" />
     <Compile Include="Alignments\AlignmentSCS.cs" />
+    <Compile Include="Alignments\AlignmentSCSCS.cs" />
     <Compile Include="Alignments\AlignmentSpiral.cs" />
     <Compile Include="Drawings\Drawing.cs" />
     <Compile Include="ProfileViews\ProfileView.cs" />

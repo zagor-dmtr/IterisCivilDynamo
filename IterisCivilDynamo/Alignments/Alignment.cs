@@ -10,14 +10,15 @@ using DynamoServices;
 using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
-using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 using AcPoint2d = Autodesk.AutoCAD.Geometry.Point2d;
+using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
-    /// Alignment data
+    /// The Alignment class. Alignment objects can represent centerlines,
+    /// lanes, shoulders, right-of-ways, or construction baselines.
     /// </summary>
     [RegisterForTrace]
     public sealed class Alignment : CivilObject
@@ -28,31 +29,20 @@ namespace IterisCivilDynamo.Alignments
             : base(alignment, isDynamoOwned) { }
 
         /// <summary>
-        /// Gets the alignment type.
+        /// Gets the alignment type: Centerline,
+        /// Offset, CurbReturn, Utility, Rail
         /// </summary>
-        /// <value>
-        /// Centerline
-        /// Offset
-        /// CurbReturn
-        /// Utility
-        /// Rail
-        /// </value>
         public string AlignmentType => AeccAlignment.AlignmentType.ToString();
 
         /// <summary>
-        /// Gets the Alignment creation mode.
+        /// Gets the Alignment creation mode: RuleBasedCreation or ManuallyCreation
         /// </summary>
-        /// <value>
-        /// RuleBasedCreation or ManuallyCreation
-        /// </value>
         public string CreationMode => AeccAlignment.CreationMode.ToString();
 
         /// <summary>
         /// Gets or sets the criteria file name for the current alignment.
-        /// </summary>
-        /// <remarks>
         /// The critertia file must keep consistent between the offset alignment and parent alignment.
-        /// </remarks>
+        /// </summary>
         public string CriteriaFileName
         {
             get => AeccAlignment.CriteriaFileName;
@@ -61,10 +51,8 @@ namespace IterisCivilDynamo.Alignments
 
         /// <summary>
         /// Gets or sets the name of of design check set that is used in the alignment.
-        /// </summary>
-        /// <remarks>
         /// Return "" when there is no design check set applied in the current alignment.
-        /// </remarks>
+        /// </summary>
         public string DesignCheckSetName
         {
             get => AeccAlignment.DesignCheckSetName;
@@ -130,7 +118,8 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Gets the name of the Site to which this Alignment belongs. a string of "" for a siteless alignment.
+        /// Gets the name of the Site to which this Alignment belongs.
+        /// a string of "" for a siteless alignment.
         /// </summary>
         public string SiteName => AeccAlignment.SiteName;
 
@@ -151,7 +140,7 @@ namespace IterisCivilDynamo.Alignments
         /// </exception>
         public string StyleName
         {
-            get => AeccAlignment.StyleName;            
+            get => AeccAlignment.StyleName;
             set => AeccAlignment.StyleName = value;
         }
 
@@ -195,7 +184,7 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Получение данных о кривых, из которых состоит трасса
+        /// Get the alignment's curves data
         /// </summary>        
         /// <returns>Список из данных о кривых трассы</returns>
         public IList<AlignmentCurve> GetCurves()
@@ -234,9 +223,9 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Выбрать трассу на чертеже
+        /// Select a alignment on the drawing
         /// </summary>       
-        /// <returns>Выбранная на чертеже трасса</returns>
+        /// <returns>Selected alignment</returns>
         public static Alignment SelectOnDwg()
         {
             Document document = Document.Current;
@@ -257,9 +246,9 @@ namespace IterisCivilDynamo.Alignments
                 (alignId, (align) => new Alignment(align));
 
         /// <summary>
-        /// Получить точки изменения геометрии трассы
+        /// Gets the geometry points of the alignment
         /// </summary>       
-        /// <returns>Список точек изменения геометрии трассы</returns>
+        /// <returns>List of points</returns>
         public IList<Point> GetPoints()
         {
             List<Point> ret = new List<Point>();
@@ -275,9 +264,9 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Получение пикетов в точках изменения геометрии трассы
+        /// Gets the stations in the geometry points of the alignment
         /// </summary>       
-        /// <returns>Список значений пикетов в точках изменения геометрии трассы</returns>
+        /// <returns>List of stations</returns>
         public IList<double> GetStations()
         {
             List<double> ret = new List<double>();
@@ -299,7 +288,7 @@ namespace IterisCivilDynamo.Alignments
         public static IList<Alignment>
             GetAllAlignments(Document document, bool allowReference)
         {
-            if (document is null) throw new ArgumentNullException("document");
+            if (document is null) throw new ArgumentNullException("document is null!");
 
             IList<Alignment> alignments = new List<Alignment>();
 
@@ -334,14 +323,54 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Получение имён всех трасс в чертеже
+        /// Get an alignments in the drawing by name
         /// </summary>
-        /// <param name="document">Документ</param>
-        /// <param name="allowReference">Включить в результат трассы из быстрых ссылок</param>
-        /// <returns>Список имён трасс в чертеже</returns>
+        /// <param name="document">Document</param>
+        /// <param name="alignmentName">The name of an alignment</param>
+        /// <returns></returns>
+        public static Alignment GetAlignmentByName(Document document, string alignmentName)
+        {
+            if (document is null) throw new ArgumentNullException("document is null!");
+            if (alignmentName is null) throw new ArgumentNullException("alignmentName is null!");
+
+            using (var context = new DocumentContext(document.AcDocument))
+            {
+                CivilDocument cdoc = CivilDocument
+                    .GetCivilDocument(context.Database);
+
+                Transaction tr = context.Transaction;
+
+                ObjectIdCollection alignIds = cdoc.GetAlignmentIds();
+
+                foreach (ObjectId alignId in alignIds)
+                {
+                    if (!alignId.IsValid
+                        || alignId.IsErased
+                        || alignId.IsEffectivelyErased) continue;
+
+                    if (tr.GetObject(alignId, OpenMode.ForRead, false, true)
+                        is AeccAlignment align)
+                    {
+                        if (align.Name.Equals(alignmentName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return new Alignment(align);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the names of all alignments in the drawing
+        /// </summary>
+        /// <param name="document">Drawing document</param>
+        /// <param name="allowReference">Include the referenced alignment to the result</param>
+        /// <returns>List of alignments names</returns>
         public static IList<string> GetAllAlignmentNames(Document document, bool allowReference)
         {
-            if (document is null) throw new ArgumentNullException("document");
+            if (document is null) throw new ArgumentNullException("document is null!");
 
             IList<string> alignNames = new List<string>();
 

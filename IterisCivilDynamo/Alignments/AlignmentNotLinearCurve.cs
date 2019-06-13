@@ -1,23 +1,22 @@
 ﻿using Autodesk.DesignScript.Runtime;
-using DynamoServices;
 using IterisCivilDynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
-    /// Базовый объект для не прямолинейной кривой трассы
+    /// Base object for not-linear alignment curve
     /// </summary>
     [IsVisibleInDynamoLibrary(false)]
     public abstract class AlignmentNotLinearCurve : AlignmentCurve
     {
         /// <summary>
-        /// Направление в начале
+        /// Direction in start
         /// </summary>
         public virtual double StartDirection { get; private set; }
 
         /// <summary>
-        /// Направление в конце
+        /// Direction in end
         /// </summary>
         public virtual double EndDirection { get; private set; }
 
@@ -35,12 +34,8 @@ namespace IterisCivilDynamo.Alignments
         {
             SetProps(subEntity);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="curve"></param>
-        protected override void SetProps(object curve)
+        
+        protected private override void SetProps(object curve)
         {
             base.SetProps(curve);
             StartDirection = ReflectionSupport

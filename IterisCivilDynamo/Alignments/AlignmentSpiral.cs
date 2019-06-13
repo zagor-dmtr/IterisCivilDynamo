@@ -7,7 +7,9 @@ using C3dDb = Autodesk.Civil.DatabaseServices;
 namespace IterisCivilDynamo.Alignments
 {
     /// <summary>
-    /// Alignment spirale data
+    /// The AlignmentSpiral Class. AlignmentSpiral derives from the
+    /// AlignmentCurve class, and represents an AlignmentEntity made
+    /// up of a single spiral 
     /// </summary>
     [RegisterForTrace]
     public class AlignmentSpiral : AlignmentNotLinearCurve
@@ -15,19 +17,15 @@ namespace IterisCivilDynamo.Alignments
         private PointData _radialPoint, _sPIPoint;
 
         /// <summary>
-        /// Spirale parameter A
+        /// Gets the AlignmentSpiral entity constraint type:
+        /// StartPtAndDirRadiusLength or StartPtAndDirStartAndEndRadiusLength
+        /// </summary>
+        public string AlignmentSpiralConstraintType { get; private set; }
+
+        /// <summary>
+        /// Gets the spiral A value.
         /// </summary>
         public double A { get; private set; }
-
-        /// <summary>
-        /// Spirale parameter K
-        /// </summary>
-        public double K { get; private set; }
-
-        /// <summary>
-        /// Spirale parameter P
-        /// </summary>
-        public double P { get; private set; }
 
         /// <summary>
         /// Gets the AlignmentSpiral entity Simple/Compound Flag
@@ -37,12 +35,27 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Gets the AlignmentSpiral entity Incurve/Outcurve type
         /// </summary>
-        public string CurveType { get; private set; }  
+        public string CurveType { get; private set; }
+
+        /// <summary>
+        /// Gets the AlignmentCurve's delta
+        /// </summary>
+        public override double Delta => base.Delta;
 
         /// <summary>
         /// Left or right
         /// </summary>
         public string Direction { get; private set; }
+
+        /// <summary>
+        /// Gets the direction value at the end point.
+        /// </summary>
+        public override double EndDirection => base.EndDirection;
+
+        /// <summary>
+        /// Gets the spiral K value.
+        /// </summary>
+        public double K { get; private set; }
 
         /// <summary>
         /// Gets the spiral long tangent.
@@ -55,12 +68,22 @@ namespace IterisCivilDynamo.Alignments
         public double MinimumTransitionLength { get; private set; }
 
         /// <summary>
-        /// Входной радиус
+        /// Gets the spiral P value.
+        /// </summary>
+        public double P { get; private set; }
+
+        /// <summary>
+        /// Gets the AlignmentSpiral subentity radial Point2D coordinate.
+        /// </summary>
+        public Point RadialPoint => _radialPoint.CreateDynamoPoint();
+
+        /// <summary>
+        /// Gets the incoming curve radius.
         /// </summary>
         public double RadiusIn { get; private set; }
 
         /// <summary>
-        /// Выходной радиус
+        /// Gets the outgoing curve radius.
         /// </summary>
         public double RadiusOut { get; private set; }
 
@@ -75,9 +98,27 @@ namespace IterisCivilDynamo.Alignments
         public double SPIAngle { get; private set; }
 
         /// <summary>
-        /// Способ построения спирали (клотоида, синусоида и т.п.)
+        /// Gets the AlignmentSpiral entity SPI Point2D coordinate.
+        /// </summary>
+        public Point SPIPoint => _sPIPoint.CreateDynamoPoint();
+
+        /// <summary>
+        /// Gets the AlignmentSpiral entity spiral type: Clothoid, JapaneseCubic,
+        /// SineHalfWave, Bloss, CubicParabola, Sinusoidal, BiQuadratic, OffsetClothoid,
+        /// OffsetHalfWaveLenDimnTangent, OffsetJapaneseCubic, OffsetBloss, OffsetCubicParabola,
+        /// OffsetSinusoidal,OffsetBiQuadratic, OffsetHalfWaveLenDimnTangent2, OffsetInvalidSpiralType
         /// </summary>
         public string SpiralDefinition { get; private set; }
+
+        /// <summary>
+        /// Gets the AlignmentSpiral entity SPI station.
+        /// </summary>
+        public double SPIStation { get; private set; }
+
+        /// <summary>
+        /// Gets the direction value at the start point.
+        /// </summary>
+        public override double StartDirection => base.StartDirection;
 
         /// <summary>
         /// Gets the spiral total X value.
@@ -87,37 +128,7 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Gets the spiral total Y value.
         /// </summary>
-        public double TotalY { get; private set; }
-
-        /// <summary>
-        /// Gets the AlignmentSpiral subentity radial Point2D coordinate.
-        /// </summary>
-        public Point RadialPoint => _radialPoint.CreateDynamoPoint();
-
-        /// <summary>
-        /// Gets the AlignmentSpiral entity SPI Point2D coordinate.
-        /// </summary>
-        public Point SPIPoint => _sPIPoint.CreateDynamoPoint();
-
-        /// <summary>
-        /// Gets the AlignmentSpiral entity SPI station.
-        /// </summary>
-        public double SPIStation { get; private set; }
-
-        /// <summary>
-        /// Direction in start
-        /// </summary>
-        public override double StartDirection => base.StartDirection;
-
-        /// <summary>
-        /// Deirection in end
-        /// </summary>
-        public override double EndDirection => base.EndDirection;
-
-        /// <summary>
-        /// Gets the AlignmentCurve's delta
-        /// </summary>
-        public override double Delta => base.Delta;
+        public double TotalY { get; private set; }        
 
         internal AlignmentSpiral(C3dDb.AlignmentSpiral spiral)
             : base(spiral)
@@ -129,14 +140,11 @@ namespace IterisCivilDynamo.Alignments
             : base(subEntitySpiral)
         {            
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="spiral"></param>
-        protected override void SetProps(object spiral)
+        
+        protected private override void SetProps(object spiral)
         {
             base.SetProps(spiral);
+            AlignmentSpiralConstraintType = GetConstraint2(spiral);
             A = ReflectionSupport.GetProperty(spiral, "A", double.NaN);
             K = ReflectionSupport.GetProperty(spiral, "K", double.NaN);
             P = ReflectionSupport.GetProperty(spiral, "P", double.NaN);
