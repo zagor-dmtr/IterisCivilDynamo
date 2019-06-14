@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.DynamoApp.Services;
 using Autodesk.AutoCAD.DynamoNodes;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.Civil.ApplicationServices;
 using Autodesk.Civil.DynamoNodes;
 using Autodesk.DesignScript.Geometry;
@@ -10,8 +11,6 @@ using DynamoServices;
 using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
-using AcPoint2d = Autodesk.AutoCAD.Geometry.Point2d;
-using AeccAlignment = Autodesk.Civil.DatabaseServices.Alignment;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Alignments
@@ -23,9 +22,9 @@ namespace IterisCivilDynamo.Alignments
     [RegisterForTrace]
     public sealed class Alignment : CivilObject
     {
-        internal AeccAlignment AeccAlignment => AcObject as AeccAlignment;
+        internal C3dDb.Alignment AeccAlignment => AcObject as C3dDb.Alignment;
 
-        internal Alignment(AeccAlignment alignment, bool isDynamoOwned = false)
+        internal Alignment(C3dDb.Alignment alignment, bool isDynamoOwned = false)
             : base(alignment, isDynamoOwned) { }
 
         /// <summary>
@@ -105,7 +104,7 @@ namespace IterisCivilDynamo.Alignments
         public Point ReferencePoint
         {
             get => PointData.FromPointObject(AeccAlignment.ReferencePoint).CreateDynamoPoint();
-            set => AeccAlignment.ReferencePoint = new AcPoint2d(value.X, value.Y);
+            set => AeccAlignment.ReferencePoint = new Point2d(value.X, value.Y);
         }
 
         /// <summary>
@@ -186,38 +185,70 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Get the alignment's curves data
         /// </summary>        
-        /// <returns>Список из данных о кривых трассы</returns>
+        /// <returns>Alignment's curves data list</returns>
         public IList<AlignmentCurve> GetCurves()
         {
             var curves = new List<AlignmentCurve>();
             foreach (C3dDb.AlignmentEntity ent in AeccAlignment.Entities)
             {
-                if (ent is C3dDb.AlignmentLine c3dAlignLine)
+                AlignmentCurve res;
+                if (ent is C3dDb.AlignmentArc arc)
                 {
-                    AlignmentLine lineData = new AlignmentLine(c3dAlignLine);
-                    curves.Add(lineData);
+                    res = new AlignmentArc(arc);
                 }
-                else if (ent is C3dDb.AlignmentArc c3dAlignArc)
+                else if (ent is C3dDb.AlignmentCCRC ccrc)
                 {
-                    AlignmentArc alignmentArc = new AlignmentArc(c3dAlignArc);
-                    curves.Add(alignmentArc);
+                    res = new AlignmentCCRC(ccrc);
                 }
-                else if (ent is C3dDb.AlignmentSpiral c3dAlignSpiral)
+                else if (ent is C3dDb.AlignmentCRC crc)
                 {
-                    AlignmentSpiral alignmentSpiral = new AlignmentSpiral(c3dAlignSpiral);
-                    curves.Add(alignmentSpiral);
+                    res = new AlignmentCRC(crc);
                 }
-                else if (ent is C3dDb.AlignmentSCS c3dAlignSCS)
+                else if (ent is C3dDb.AlignmentCTC ctc)
                 {
-                    AlignmentSCS alignmentSCS = new AlignmentSCS(c3dAlignSCS);
-                    curves.Add(alignmentSCS);
+                    res = new AlignmentCTC(ctc);
                 }
-                else if (ent is C3dDb.AlignmentCurve c3dAlignCurve)
+                else if (ent is C3dDb.AlignmentLine line)
                 {
-                    AlignmentCurve curve
-                        = new AlignmentCurve(c3dAlignCurve);
-                    curves.Add(curve);
+                    res = new AlignmentLine(line);                    
                 }
+                else if (ent is C3dDb.AlignmentMultipleSegments ms)
+                {
+                    res = new AlignmentMultipleSegments(ms);
+                }
+                else if (ent is C3dDb.AlignmentSCS scs)
+                {
+                    res = new AlignmentSCS(scs);                    
+                }                
+                else if (ent is C3dDb.AlignmentSCSCS scscs)
+                {
+                    res = new AlignmentSCSCS(scscs);
+                }
+                else if (ent is C3dDb.AlignmentSCSSCS scsscs)
+                {
+                    res = new AlignmentSCSSCS(scsscs);
+                }
+                else if (ent is C3dDb.AlignmentSpiral spiral)
+                {
+                    res = new AlignmentSpiral(spiral);
+                }
+                else if (ent is C3dDb.AlignmentSSCSS sscss)
+                {
+                    res = new AlignmentSSCSS(sscss);
+                }
+                else if (ent is C3dDb.AlignmentSTS sts)
+                {
+                    res = new AlignmentSTS(sts);
+                }                            
+                else if (ent is C3dDb.AlignmentCurve curve)
+                {
+                    res = new AlignmentCurve(curve);                    
+                }
+                else
+                {
+                    continue;
+                }
+                curves.Add(res);
             }
             return curves;
         }
@@ -233,7 +264,7 @@ namespace IterisCivilDynamo.Alignments
             PromptEntityOptions alignSelOpt
                 = new PromptEntityOptions("\nSelect an alignment:");
             alignSelOpt.SetRejectMessage("\nIt is not an alignment!");
-            alignSelOpt.AddAllowedClass(typeof(AeccAlignment), true);
+            alignSelOpt.AddAllowedClass(typeof(C3dDb.Alignment), true);
             PromptEntityResult alignSelRes = ed.GetEntity(alignSelOpt);
             return alignSelRes.Status == PromptStatus.OK
                 ? Get(alignSelRes.ObjectId)
@@ -242,7 +273,7 @@ namespace IterisCivilDynamo.Alignments
 
         [IsVisibleInDynamoLibrary(false)]
         internal static Alignment Get(ObjectId alignId)
-            => CivilObjectSupport.Get<Alignment, AeccAlignment>
+            => CivilObjectSupport.Get<Alignment, C3dDb.Alignment>
                 (alignId, (align) => new Alignment(align));
 
         /// <summary>
@@ -308,7 +339,7 @@ namespace IterisCivilDynamo.Alignments
                         || alignId.IsEffectivelyErased) continue;
 
                     if (tr.GetObject(alignId, OpenMode.ForRead, false, true)
-                        is AeccAlignment align)
+                        is C3dDb.Alignment align)
                     {
                         if (allowReference
                             || (!align.IsReferenceObject && !align.IsReferenceSubObject))
@@ -349,7 +380,7 @@ namespace IterisCivilDynamo.Alignments
                         || alignId.IsEffectivelyErased) continue;
 
                     if (tr.GetObject(alignId, OpenMode.ForRead, false, true)
-                        is AeccAlignment align)
+                        is C3dDb.Alignment align)
                     {
                         if (align.Name.Equals(alignmentName, StringComparison.OrdinalIgnoreCase))
                         {
@@ -390,7 +421,7 @@ namespace IterisCivilDynamo.Alignments
                         || alignId.IsEffectivelyErased) continue;
 
                     if (tr.GetObject(alignId, OpenMode.ForRead, false, true)
-                        is AeccAlignment align)
+                        is C3dDb.Alignment align)
                     {
                         if (allowReference
                             || (!align.IsReferenceObject && !align.IsReferenceSubObject))

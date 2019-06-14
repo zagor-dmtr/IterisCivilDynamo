@@ -169,7 +169,8 @@ namespace IterisCivilDynamo.Alignments
             SubEntityCount = ReflectionSupport.GetProperty(curve, "SubEntityCount", 0);
         }
        
-        protected private AlignmentCurve(C3dDb.AlignmentSubEntity subEntity) : this(subEntity as object)
+        protected private AlignmentCurve(C3dDb.AlignmentSubEntity subEntity)
+            : this(subEntity as object)
         {
             IsSubEntity = true;
             Type = ReflectionSupport.GetProperty
@@ -199,6 +200,18 @@ namespace IterisCivilDynamo.Alignments
         private protected string GetConstraint2(object obj)
             => ReflectionSupport.GetProperty
                 (obj, "Constraint2", (object)"NO_TYPE").ToString();
+
+        private protected void SafeAction(Action forTry, Action forCatch)
+        {
+            try
+            {
+                forTry();
+            }
+            catch
+            {
+                forCatch();
+            }
+        }
 
         private void CheckForSubEntity(string propName)
         {

@@ -14,12 +14,12 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Gets the first arc of the SCSCS group.
         /// </summary>
-        public AlignmentArc Arc1 { get; }
+        public AlignmentArc Arc1 { get; private set; }
 
         /// <summary>
         /// Gets the second arc of the SCSCS group.
         /// </summary>
-        public AlignmentArc Arc2 { get; }
+        public AlignmentArc Arc2 { get; private set; }
 
         /// <summary>
         /// Gets the AlignmentSCSCS entity constraint type: SpLenAndTanLenIn,
@@ -36,27 +36,37 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Gets the first spiral of the SCSCS group.
         /// </summary>
-        public AlignmentSpiral Spiral1 { get; }
+        public AlignmentSpiral Spiral1 { get; private set; }
 
         /// <summary>
         /// Gets the second spiral of the SCSCS group.
         /// </summary>
-        public AlignmentSpiral Spiral2 { get; }
+        public AlignmentSpiral Spiral2 { get; private set; }
 
         /// <summary>
         /// Gets the third spiral of the SCSCS group.
         /// </summary>
-        public AlignmentSpiral Spiral3 { get; }
+        public AlignmentSpiral Spiral3 { get; private set; }
 
-        internal AlignmentSCSCS(C3dDb.AlignmentSCSCS alignmentSCSCS) : base(alignmentSCSCS)
+        internal AlignmentSCSCS(C3dDb.AlignmentSCSCS obj) : base(obj)
         {
-            Arc1 = new AlignmentArc(alignmentSCSCS.Arc1);
-            Arc2 = new AlignmentArc(alignmentSCSCS.Arc2);
-            Spiral1 = new AlignmentSpiral(alignmentSCSCS.Spiral1);
-            Spiral2 = new AlignmentSpiral(alignmentSCSCS.Spiral2);
-            Spiral3 = new AlignmentSpiral(alignmentSCSCS.Spiral3);
+            SafeAction
+                (() => Arc1 = new AlignmentArc(obj.Arc1),
+                () => Arc1 = null);
+            SafeAction
+                (() => Arc2 = new AlignmentArc(obj.Arc2),
+                () => Arc2 = null);
+            SafeAction
+               (() => Spiral1 = new AlignmentSpiral(obj.Spiral1),
+               () => Spiral1 = null);
+            SafeAction
+                (() => Spiral2 = new AlignmentSpiral(obj.Spiral2),
+                () => Spiral2 = null);
+            SafeAction
+                (() => Spiral3 = new AlignmentSpiral(obj.Spiral3),
+                () => Spiral3 = null);
             AlignmentSCSCSConstraintType
-                = alignmentSCSCS.Constraint2.ToString();
+                = obj.Constraint2.ToString();
         }
     }
 }

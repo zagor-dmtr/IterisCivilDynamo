@@ -13,30 +13,38 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Gets the arc1 of the CCRC group.
         /// </summary>
-        public AlignmentArc Arc1 { get; }
+        public AlignmentArc Arc1 { get; private set; }
 
         /// <summary>
         /// Gets the arc2 of the CCRC group.
         /// </summary>
-        public AlignmentArc Arc2 { get; }
+        public AlignmentArc Arc2 { get; private set; }
 
         /// <summary>
         /// Gets the arc3 of the CCRC group.
         /// </summary>
-        public AlignmentArc Arc3 { get; }
+        public AlignmentArc Arc3 { get; private set; }
 
         /// <summary>
-        /// Defines the underlying Curve-Curve-ReverseCurve entity constraint type.
+        /// Defines the underlying Curve-Curve-ReverseCurve entity
+        /// constraint type: TransitionLengthRadius1Radius2Radius3
         /// </summary>
         public string AlignmentCCRCConstraintType { get; }
        
-        internal AlignmentCCRC(C3dDb.AlignmentCCRC alignmentCCRC) : base(alignmentCCRC)
+        internal AlignmentCCRC(C3dDb.AlignmentCCRC obj) : base(obj)
         {
-            Arc1 = new AlignmentArc(alignmentCCRC.Arc1);
-            Arc2 = new AlignmentArc(alignmentCCRC.Arc2);
-            Arc3 = new AlignmentArc(alignmentCCRC.Arc3);
+            SafeAction
+                (() => Arc1 = new AlignmentArc(obj.Arc1),
+                () => Arc1 = null);
+            SafeAction
+                (() => Arc2 = new AlignmentArc(obj.Arc2),
+                () => Arc2 = null);
+            SafeAction
+                (() => Arc3 = new AlignmentArc(obj.Arc3),
+                () => Arc3 = null);
+
             AlignmentCCRCConstraintType
-                = alignmentCCRC.Constraint2.ToString();
+                = obj.Constraint2.ToString();
         }
     }
 }

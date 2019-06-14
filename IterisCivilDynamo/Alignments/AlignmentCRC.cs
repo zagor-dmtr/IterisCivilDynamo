@@ -13,24 +13,28 @@ namespace IterisCivilDynamo.Alignments
         /// <summary>
         /// Gets the arc1 of the CRC group.
         /// </summary>
-        public AlignmentArc Arc1 { get; }
+        public AlignmentArc Arc1 { get; private set; }
 
         /// <summary>
         /// Gets the arc2 of the CRC group.
         /// </summary>
-        public AlignmentArc Arc2 { get; }
+        public AlignmentArc Arc2 { get; private set; }
 
         /// <summary>
         /// Gets the AlignmentCRC entity constraint type: Radius1 or Radius2
         /// </summary>
         public string AlignmentCRCConstraintType { get; }
 
-        internal AlignmentCRC(C3dDb.AlignmentCRC alignmentCRC) : base(alignmentCRC)
+        internal AlignmentCRC(C3dDb.AlignmentCRC crc) : base(crc)
         {
-            Arc1 = new AlignmentArc(alignmentCRC.Arc1);
-            Arc2 = new AlignmentArc(alignmentCRC.Arc2);
+            SafeAction
+               (() => Arc1 = new AlignmentArc(crc.Arc1),
+               () => Arc1 = null);
+            SafeAction
+                (() => Arc2 = new AlignmentArc(crc.Arc2),
+                () => Arc2 = null);
             AlignmentCRCConstraintType
-                = alignmentCRC.Constraint2.ToString();
+                = crc.Constraint2.ToString();
         }
     }
 }

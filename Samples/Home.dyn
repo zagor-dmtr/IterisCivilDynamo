@@ -1,0 +1,268 @@
+{
+  "Uuid": "8b402733-9163-4039-be60-74e2f74ad699",
+  "IsCustomNode": false,
+  "Description": null,
+  "Name": "Home",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "IterisCivilDynamo.Drawings.Utils.CreateAnonymousGroup@Autodesk.AutoCAD.DynamoNodes.Object[]",
+      "Id": "66685abea68d4c509fd9c18cd26abc2f",
+      "Inputs": [
+        {
+          "Id": "cd555836401643cbbb02267433f5e7b8",
+          "Name": "objects",
+          "Description": "Object[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "737dc2e76ba14d8d891c117d4af259a0",
+          "Name": "void",
+          "Description": "void",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Create an anonymous group from objects\n\nUtils.CreateAnonymousGroup (objects: Object[]): void"
+    },
+    {
+      "ConcreteType": "Autodesk.AutoCAD.DynamoNodes.AcObjectsOnLayer, AutoCADNodesUI",
+      "NodeType": "ExtensionNode",
+      "Id": "c3ecb1bc492a403d9ebfbc3c4990c323",
+      "Inputs": [
+        {
+          "Id": "65bb3373173c4b8298cfc8f0869bb910",
+          "Name": "layer",
+          "Description": "string",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "ca14592029f9446889096533a906a619",
+          "Name": "block",
+          "Description": "Block",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "8d3f379ff58a4ef6a0973628c2a0cbb4",
+          "Name": "Objects",
+          "Description": "Object[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Select all objects on layer."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Autodesk.AutoCAD.DynamoNodes.Document.ModelSpace",
+      "Id": "9fee09578fcb4829ad17bef998931fa7",
+      "Inputs": [
+        {
+          "Id": "998f590ec2194d4d912b74eacf3f8233",
+          "Name": "document",
+          "Description": "Autodesk.AutoCAD.DynamoNodes.Document",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "da9b9ee84e0e4647aa06d8e355d4b87d",
+          "Name": "Block",
+          "Description": "Block",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Get the model space block table record.\n\nDocument.ModelSpace: Block"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Autodesk.AutoCAD.DynamoNodes.Document.Current",
+      "Id": "67736264caff47dbac3d1f9990102bea",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "13640444ec414cbb8c358c72f46a0792",
+          "Name": "Document",
+          "Description": "Document",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Get the current AutoCAD document.\n\nDocument.Current: Document"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Autodesk.AutoCAD.DynamoNodes.Document.CurrentLayer",
+      "Id": "215243b86fb1495ebd0e3efe3fabb786",
+      "Inputs": [
+        {
+          "Id": "1d841c5a36a54abab6679c6c58673f17",
+          "Name": "document",
+          "Description": "Autodesk.AutoCAD.DynamoNodes.Document",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "3fa302836ffc4a9d96f1f99d90c3e1ca",
+          "Name": "string",
+          "Description": "string",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Get the current layer of the current document.\n\nDocument.CurrentLayer: string"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "8d3f379ff58a4ef6a0973628c2a0cbb4",
+      "End": "cd555836401643cbbb02267433f5e7b8",
+      "Id": "eebb4f1cbe3f4aa99d51a1a7c05d1398"
+    },
+    {
+      "Start": "da9b9ee84e0e4647aa06d8e355d4b87d",
+      "End": "ca14592029f9446889096533a906a619",
+      "Id": "da54352a61e64758974e017721902ead"
+    },
+    {
+      "Start": "13640444ec414cbb8c358c72f46a0792",
+      "End": "998f590ec2194d4d912b74eacf3f8233",
+      "Id": "6c7977c373f14c7aa52182db74872b09"
+    },
+    {
+      "Start": "13640444ec414cbb8c358c72f46a0792",
+      "End": "1d841c5a36a54abab6679c6c58673f17",
+      "Id": "1e3322e04f4f443a82fc28f51d88355c"
+    },
+    {
+      "Start": "3fa302836ffc4a9d96f1f99d90c3e1ca",
+      "End": "65bb3373173c4b8298cfc8f0869bb910",
+      "Id": "f94d8ad8820a40bf8422134eaf89d067"
+    }
+  ],
+  "Dependencies": [],
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.1.1.7865",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "NodeViews": [
+      {
+        "ShowGeometry": true,
+        "Name": "Utils.CreateAnonymousGroup",
+        "Id": "66685abea68d4c509fd9c18cd26abc2f",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 491.00098659420019,
+        "Y": 15.152231442693761
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "All Objects on Layer",
+        "Id": "c3ecb1bc492a403d9ebfbc3c4990c323",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 240.5,
+        "Y": 19.0
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Document.ModelSpace",
+        "Id": "9fee09578fcb4829ad17bef998931fa7",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": -23.082392200262007,
+        "Y": 143.26340316864355
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Document.Current",
+        "Id": "67736264caff47dbac3d1f9990102bea",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": -189.37520457508049,
+        "Y": 58.927994850263758
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "Document.CurrentLayer",
+        "Id": "215243b86fb1495ebd0e3efe3fabb786",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": -20.855031630421536,
+        "Y": -38.236789550260227
+      }
+    ],
+    "Annotations": [],
+    "X": 155.30294226801215,
+    "Y": 42.251869096111676,
+    "Zoom": 0.65867485215821509
+  }
+}
