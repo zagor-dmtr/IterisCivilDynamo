@@ -17,11 +17,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\IterisCivilDynamo.xml</DocumentationFile>
+    <DocumentationFile>C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\IterisCivilDynamo.xml</DocumentationFile>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
