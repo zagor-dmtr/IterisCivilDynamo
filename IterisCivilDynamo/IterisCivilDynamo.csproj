@@ -17,11 +17,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\IterisCivilDynamo.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\IterisCivilDynamo.xml</DocumentationFile>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -104,6 +104,7 @@
     <Compile Include="Alignments\AlignmentSpiral.cs" />
     <Compile Include="Alignments\AlignmentSSCSS.cs" />
     <Compile Include="Alignments\AlignmentSTS.cs" />
+    <Compile Include="AutoCAD\Hatch.cs" />
     <Compile Include="Drawings\Drawing.cs" />
     <Compile Include="Drawings\Utils.cs" />
     <Compile Include="ProfileViews\ProfileView.cs" />
@@ -112,6 +113,15 @@
     <Compile Include="Support\PointData.cs" />
     <Compile Include="Support\ReflectionSupport.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\pkg.json">
+      <Link>pkg.json</Link>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\$(TargetFileName)"
+copy /Y "$(TargetDir)$(TargetName).xml" "C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\$(TargetName).xml"
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
