@@ -254,6 +254,121 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
+        /// Get the alignment's curves data
+        /// </summary>        
+        /// <returns>Alignment's curves data list</returns>
+        [MultiReturn
+            ("ArcCurves",
+            "CCRCCurves",
+            "CRCCurves",
+            "CTCCurves",
+            "LineCurves",
+            "MultiSegmentCurves",
+            "SCSCurves",
+            "SCSCSCurves",
+            "SCSSCSCurves",
+            "SpiralCurves",
+            "SSCSSCurves",
+            "STSCurves",
+            "UndefinedCurves")]
+        public Dictionary<string, List<AlignmentCurve>> GetSortedCurves()
+        {
+            List<AlignmentCurve>                
+                ArcCurves = new List<AlignmentCurve>(),
+                CCRCCurves = new List<AlignmentCurve>(),
+                CRCCurves = new List<AlignmentCurve>(),
+                CTCCurves = new List<AlignmentCurve>(),
+                LineCurves = new List<AlignmentCurve>(),
+                MultiSegmentCurves = new List<AlignmentCurve>(),
+                SCSCurves = new List<AlignmentCurve>(),
+                SCSCSCurves = new List<AlignmentCurve>(),
+                SCSSCSCurves = new List<AlignmentCurve>(),
+                SpiralCurves = new List<AlignmentCurve>(),
+                SSCSSCurves = new List<AlignmentCurve>(),
+                STSCurves = new List<AlignmentCurve>(),
+                UndefinedCurves = new List<AlignmentCurve>();
+
+            Dictionary<string, List<AlignmentCurve>> ret
+                = new Dictionary<string, List<AlignmentCurve>>
+            {
+                { "ArcCurves", ArcCurves },
+                { "CCRCCurves", CCRCCurves},
+                { "CRCCurves", CRCCurves},
+                { "CTCCurves", CTCCurves},
+                { "LineCurves", LineCurves},
+                { "MultiSegmentCurves", MultiSegmentCurves },
+                { "SCSCurves", SCSCurves },
+                { "SCSCSCurves", SCSCSCurves },
+                { "SCSSCSCurves", SCSSCSCurves },
+                { "SpiralCurves", SpiralCurves },
+                { "SSCSSCurves", SSCSSCurves },
+                { "STSCurves", STSCurves },
+                { "UndefinedCurves", UndefinedCurves }
+            };
+
+            foreach (C3dDb.AlignmentEntity ent in AeccAlignment.Entities)
+            {                
+                if (ent is C3dDb.AlignmentArc arc)
+                {
+                    ArcCurves.Add(new AlignmentArc(arc));
+                }
+                else if (ent is C3dDb.AlignmentCCRC ccrc)
+                {
+                    CCRCCurves.Add(new AlignmentCCRC(ccrc));
+                }
+                else if (ent is C3dDb.AlignmentCRC crc)
+                {
+                    CRCCurves.Add(new AlignmentCRC(crc));
+                }
+                else if (ent is C3dDb.AlignmentCTC ctc)
+                {
+                    CTCCurves.Add(new AlignmentCTC(ctc));
+                }
+                else if (ent is C3dDb.AlignmentLine line)
+                {
+                    LineCurves.Add(new AlignmentLine(line));
+                }
+                else if (ent is C3dDb.AlignmentMultipleSegments ms)
+                {
+                    MultiSegmentCurves.Add(new AlignmentMultipleSegments(ms));
+                }
+                else if (ent is C3dDb.AlignmentSCS scs)
+                {
+                    SCSCurves.Add(new AlignmentSCS(scs));
+                }
+                else if (ent is C3dDb.AlignmentSCSCS scscs)
+                {
+                    SCSCSCurves.Add(new AlignmentSCSCS(scscs));
+                }
+                else if (ent is C3dDb.AlignmentSCSSCS scsscs)
+                {
+                    SCSSCSCurves.Add(new AlignmentSCSSCS(scsscs));
+                }
+                else if (ent is C3dDb.AlignmentSpiral spiral)
+                {
+                    SpiralCurves.Add(new AlignmentSpiral(spiral));
+                }
+                else if (ent is C3dDb.AlignmentSSCSS sscss)
+                {
+                    SSCSSCurves.Add(new AlignmentSSCSS(sscss));
+                }
+                else if (ent is C3dDb.AlignmentSTS sts)
+                {
+                    STSCurves.Add(new AlignmentSTS(sts));
+                }
+                else if (ent is C3dDb.AlignmentCurve curve)
+                {
+                    UndefinedCurves.Add(new AlignmentCurve(curve));
+                }
+                else
+                {
+                    continue;
+                }                
+            }
+            return ret;
+        }
+
+        /// <summary>
         /// Select a alignment on the drawing
         /// </summary>       
         /// <returns>Selected alignment</returns>
