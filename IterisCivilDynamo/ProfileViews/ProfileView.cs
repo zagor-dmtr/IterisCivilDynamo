@@ -76,7 +76,7 @@ namespace IterisCivilDynamo.ProfileViews
         /// <summary>
         /// Gets the alignment from which the profile view was created.
         /// </summary>
-        public AlignmentNode Alignment => AlignmentNode.Get(AlignmentId);
+        public AlignmentNode Alignment => AlignmentNode.GetByObjectId(AlignmentId);
 
         /// <summary>
         /// Gets the name of the alignment from which the profile view was created.

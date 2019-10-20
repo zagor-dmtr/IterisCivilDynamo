@@ -382,12 +382,12 @@ namespace IterisCivilDynamo.Alignments
             alignSelOpt.AddAllowedClass(typeof(C3dDb.Alignment), true);
             PromptEntityResult alignSelRes = ed.GetEntity(alignSelOpt);
             return alignSelRes.Status == PromptStatus.OK
-                ? Get(alignSelRes.ObjectId)
+                ? GetByObjectId(alignSelRes.ObjectId)
                 : null;
         }
 
         [IsVisibleInDynamoLibrary(false)]
-        internal static Alignment Get(ObjectId alignId)
+        internal static Alignment GetByObjectId(ObjectId alignId)
             => CivilObjectSupport.Get<Alignment, C3dDb.Alignment>
                 (alignId, (align) => new Alignment(align));
 

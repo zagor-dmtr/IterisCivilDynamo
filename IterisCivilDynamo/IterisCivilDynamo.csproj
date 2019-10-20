@@ -107,6 +107,10 @@
     <Compile Include="AutoCAD\Hatch.cs" />
     <Compile Include="Drawings\Drawing.cs" />
     <Compile Include="Drawings\Utils.cs" />
+    <Compile Include="Networks\Network.cs" />
+    <Compile Include="Networks\Part.cs" />
+    <Compile Include="Networks\Pipe.cs" />
+    <Compile Include="Networks\Structure.cs" />
     <Compile Include="ProfileViews\ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\CivilObjectSupport.cs" />
