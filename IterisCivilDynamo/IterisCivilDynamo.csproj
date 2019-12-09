@@ -118,14 +118,14 @@
     <Compile Include="Support\ReflectionSupport.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\pkg.json">
+    <None Include="C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.4\packages\IterisCivilDynamo\pkg.json">
       <Link>pkg.json</Link>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\$(TargetFileName)"
-copy /Y "$(TargetDir)$(TargetName).xml" "C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.1\packages\IterisCivilDynamo\bin\$(TargetName).xml"
+    <PostBuildEvent>copy /Y "$(TargetPath)" "C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.4\packages\IterisCivilDynamo\bin\$(TargetFileName)"
+copy /Y "$(TargetDir)$(TargetName).xml" "C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.4\packages\IterisCivilDynamo\bin\$(TargetName).xml"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

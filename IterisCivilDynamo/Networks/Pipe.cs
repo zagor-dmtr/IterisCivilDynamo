@@ -1,5 +1,7 @@
-﻿using Autodesk.AutoCAD.Geometry;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.DesignScript.Geometry;
+using Autodesk.DesignScript.Runtime;
 using DynamoServices;
 using IterisCivilDynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
@@ -17,6 +19,11 @@ namespace IterisCivilDynamo.Networks
         internal Pipe(C3dDb.Entity entity, bool isDynamoOwned = false) : base(entity, isDynamoOwned)
         {
         }
+
+        [IsVisibleInDynamoLibrary(false)]
+        internal static Pipe GetByObjectId(ObjectId pipeId)
+            => CivilObjectSupport.Get<Pipe, C3dDb.Pipe>
+                (pipeId, (pipe) => new Pipe(pipe));
 
         /// <summary>
         /// Gets the end point's cover of pipe.

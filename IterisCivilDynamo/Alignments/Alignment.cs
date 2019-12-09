@@ -11,6 +11,7 @@ using DynamoServices;
 using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Alignments
@@ -105,6 +106,68 @@ namespace IterisCivilDynamo.Alignments
         {
             get => PointData.FromPointObject(AeccAlignment.ReferencePoint).CreateDynamoPoint();
             set => AeccAlignment.ReferencePoint = new Point2d(value.X, value.Y);
+        }
+
+        struct Tmp
+        {
+            public C3dDb.Station StationData;
+            public double Station;
+
+            public Tmp(C3dDb.Alignment alignment, C3dDb.Station data)
+            {
+                StationData = data;
+                double station = 0.0, offset = 0.0;
+                alignment.StationOffset
+                    (data.Location.X,
+                    data.Location.Y,
+                    ref station,
+                    ref offset);
+                Station = station;
+            }           
+        }
+
+        /// <summary>
+        /// Gets the Alignment PI points
+        /// </summary>
+        public IList<Point> PIPoints
+        {
+            get
+            {
+                List<Point2d> piPts = new List<Point2d>();
+                Tmp[] allPIStations = AeccAlignment
+                    .GetStationSet(C3dDb.StationTypes.PIPoint)
+                    .Select(item => new Tmp(AeccAlignment, item))
+                    .ToArray();
+
+                foreach (AlignmentCurve curve in GetCurves())
+                {
+                    C3dDb.Station[] curveStats = allPIStations
+                        .Where(item => curve.StartStation <= item.Station && item.Station <= curve.EndStation)
+                        .Select(item => item.StationData)
+                        .ToArray();
+
+                    if (curveStats.Length > 0)
+                    {
+                        if (curve.SubEntityCount <= 1)
+                        {
+                            piPts.Add(curveStats[0].Location);
+                        }
+                        else
+                        {
+                            var piStat = curveStats.FirstOrDefault
+                                (item => item.GeometryStationType == C3dDb.AlignmentGeometryPointStationType.PI);
+                            if (piStat != null)
+                            {
+                                piPts.Add(piStat.Location);
+                            }
+                        }
+                    }
+                }
+
+                return piPts
+                     .Select(item => PointData.FromPointObject(item).CreateDynamoPoint())
+                     .ToList();
+            }
         }
 
         /// <summary>
@@ -210,7 +273,7 @@ namespace IterisCivilDynamo.Alignments
                 }
                 else if (ent is C3dDb.AlignmentLine line)
                 {
-                    res = new AlignmentLine(line);                    
+                    res = new AlignmentLine(line);
                 }
                 else if (ent is C3dDb.AlignmentMultipleSegments ms)
                 {
@@ -218,8 +281,8 @@ namespace IterisCivilDynamo.Alignments
                 }
                 else if (ent is C3dDb.AlignmentSCS scs)
                 {
-                    res = new AlignmentSCS(scs);                    
-                }                
+                    res = new AlignmentSCS(scs);
+                }
                 else if (ent is C3dDb.AlignmentSCSCS scscs)
                 {
                     res = new AlignmentSCSCS(scscs);
@@ -239,10 +302,10 @@ namespace IterisCivilDynamo.Alignments
                 else if (ent is C3dDb.AlignmentSTS sts)
                 {
                     res = new AlignmentSTS(sts);
-                }                            
+                }
                 else if (ent is C3dDb.AlignmentCurve curve)
                 {
-                    res = new AlignmentCurve(curve);                    
+                    res = new AlignmentCurve(curve);
                 }
                 else
                 {
@@ -250,7 +313,7 @@ namespace IterisCivilDynamo.Alignments
                 }
                 curves.Add(res);
             }
-            return curves;
+            return curves.OrderBy(item => item.StartStation).ToList();
         }
 
         /// <summary>
@@ -273,7 +336,7 @@ namespace IterisCivilDynamo.Alignments
             "UndefinedCurves")]
         public Dictionary<string, List<AlignmentCurve>> GetSortedCurves()
         {
-            List<AlignmentCurve>                
+            List<AlignmentCurve>
                 ArcCurves = new List<AlignmentCurve>(),
                 CCRCCurves = new List<AlignmentCurve>(),
                 CRCCurves = new List<AlignmentCurve>(),
@@ -307,7 +370,7 @@ namespace IterisCivilDynamo.Alignments
             };
 
             foreach (C3dDb.AlignmentEntity ent in AeccAlignment.Entities)
-            {                
+            {
                 if (ent is C3dDb.AlignmentArc arc)
                 {
                     ArcCurves.Add(new AlignmentArc(arc));
@@ -363,7 +426,7 @@ namespace IterisCivilDynamo.Alignments
                 else
                 {
                     continue;
-                }                
+                }
             }
             return ret;
         }
