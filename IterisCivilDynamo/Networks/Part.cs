@@ -1,11 +1,11 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Autodesk.Civil.DynamoNodes;
 using Autodesk.DesignScript.Geometry;
 using DynamoServices;
+using IterisCivilDynamo.CivilObjects;
 using IterisCivilDynamo.Support;
 using C3dDb = Autodesk.Civil.DatabaseServices;
-using ThisAlignment = IterisCivilDynamo.Alignments.Alignment;
+using DynAlignment = IterisCivilDynamo.Alignments.Alignment;
 
 namespace IterisCivilDynamo.Networks
 {
@@ -13,23 +13,24 @@ namespace IterisCivilDynamo.Networks
     /// The Part class
     /// </summary>
     [RegisterForTrace]
-    public abstract class Part : CivilObject
-    {
+    public abstract class Part : CivilEntity
+    { 
         internal C3dDb.Part AeccPart => AcObject as C3dDb.Part;
 
-        internal Part(C3dDb.Entity entity, bool isDynamoOwned = false) : base(entity, isDynamoOwned)
+        internal Part(C3dDb.Entity entity, bool isDynamoOwned = false)
+            : base(entity, isDynamoOwned)
         {
         }
 
         /// <summary>
         /// Gets the number of parts that connects to the part
         /// </summary>
-        public int ConnectedPartCount => AeccPart.ConnectedPartCount;
+        public int ConnectedPartCount => GetInt();
 
         /// <summary>
         /// Gets the part's domain: Pipe or Structure.
         /// </summary>
-        public string Domain => AeccPart.Domain.ToString();
+        public string Domain => GetString();
 
         /// <summary>
         /// Gets the network to which this part belongs
@@ -40,60 +41,76 @@ namespace IterisCivilDynamo.Networks
         /// <summary>
         /// Gets the part size name
         /// </summary>
-        public string PartSizeName => AeccPart.PartSizeName;
+        public string PartSizeName
+            => AeccPart.PartType != C3dDb.PartType.StructNull
+            ? GetString()
+            : "Null Structure";
 
         /// <summary>
         /// Gets the part’s subtype.
         /// </summary>
-        public string PartSubType => AeccPart.PartSubType;
+        public string PartSubType => GetString();
 
         /// <summary>
         /// Gets the type of the network part.
         /// UndefinedPartType, Pipe, Channel, Wire, Conduit, StructNull,
         /// StructJunction, StructInletOutlet, StructGeneral, StructEquipment
         /// </summary>       
-        public string PartType => AeccPart.PartType.ToString();
+        public string PartType => GetString();
 
         /// <summary>
-        /// Gets or sets the position of the network part.
+        /// Gets the position of the network part.
         /// </summary>
         public Point Position
-        {
-            get => PointData.FromPointObject(AeccPart.Position).CreateDynamoPoint();
-            set => AeccPart.Position = new Point3d(value.X, value.Y, value.Z);
-        }
+            => PointData.FromPointObject(AeccPart.Position).CreateDynamoPoint();
 
         /// <summary>
-        /// Gets or sets the alignment which this part references.
+        /// Sets the position of the network part.
         /// </summary>
-        public ThisAlignment RefAlignment
-        {
-            get => ThisAlignment.GetByObjectId(AeccPart.RefAlignmentId);
-            set => AeccPart.RefAlignmentId = value?.InternalObjectId ?? ObjectId.Null;
-        }
+        /// <param name="value"></param>
+        public void SetPosition(Point value)
+            => SetValue(new Point3d(value.X, value.Y, value.Z));
 
         /// <summary>
-        /// Gets or sets the Part's style name.
+        /// Gets the alignment which this part references.
         /// </summary>
-        public string StyleName
-        {
-            get => AeccPart.StyleName;
-            set
-            {
-                try
-                {
-                    AeccPart.StyleName = value;
-                }
-                catch
-                {
+        public DynAlignment RefAlignment
+            => DynAlignment.GetByObjectId(AeccPart.RefAlignmentId);
 
-                }
-            }
-        }
+        /// <summary>
+        /// Sets the alignment which this part references.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetRefAlignment(DynAlignment value)
+            => SetValue(value?.InternalObjectId ?? ObjectId.Null);
+
+        /// <summary>
+        /// Gets RuleSetStyle by name.
+        /// </summary>
+        public string RuleSetStyleName => GetString();
+
+        /// <summary>
+        /// Sets RuleSetStyle by name.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetRuleSetStyleName(string value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the Part's style name.
+        /// </summary>
+        public string StyleName => GetString();
+
+        /// <summary>
+        /// Sets the Part's style name
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetStyleName(string value) => SetValue(value);
 
         /// <summary>
         /// Gets the wall thickness for this part
         /// </summary>
-        public double WallThickness => AeccPart.WallThickness;
+        public double WallThickness => GetDouble();
+
+       
     }
 }

@@ -4,10 +4,10 @@ using Autodesk.AutoCAD.DynamoNodes;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.Civil.ApplicationServices;
-using Autodesk.Civil.DynamoNodes;
 using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
 using DynamoServices;
+using IterisCivilDynamo.CivilObjects;
 using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
@@ -21,99 +21,112 @@ namespace IterisCivilDynamo.Alignments
     /// lanes, shoulders, right-of-ways, or construction baselines.
     /// </summary>
     [RegisterForTrace]
-    public sealed class Alignment : CivilObject
+    public sealed class Alignment : CivilEntity
     {
         internal C3dDb.Alignment AeccAlignment => AcObject as C3dDb.Alignment;
 
         internal Alignment(C3dDb.Alignment alignment, bool isDynamoOwned = false)
             : base(alignment, isDynamoOwned) { }
 
+        [SupressImportIntoVM]
+        internal static Alignment GetByObjectId(ObjectId alignId)
+            => CivilObjectSupport.Get<Alignment, C3dDb.Alignment>
+                (alignId, (align) => new Alignment(align));
+
         /// <summary>
         /// Gets the alignment type: Centerline,
         /// Offset, CurbReturn, Utility, Rail
         /// </summary>
-        public string AlignmentType => AeccAlignment.AlignmentType.ToString();
+        public string AlignmentType => GetString();
 
         /// <summary>
         /// Gets the Alignment creation mode: RuleBasedCreation or ManuallyCreation
         /// </summary>
-        public string CreationMode => AeccAlignment.CreationMode.ToString();
+        public string CreationMode => GetString();
 
         /// <summary>
-        /// Gets or sets the criteria file name for the current alignment.
+        /// Gets the criteria file name for the current alignment.
         /// The critertia file must keep consistent between the offset alignment and parent alignment.
         /// </summary>
-        public string CriteriaFileName
-        {
-            get => AeccAlignment.CriteriaFileName;
-            set => AeccAlignment.CriteriaFileName = value;
-        }
+        public string CriteriaFileName => GetString();
 
         /// <summary>
-        /// Gets or sets the name of of design check set that is used in the alignment.
+        /// Sets the criteria file name for the current alignment.
+        /// The critertia file must keep consistent between the offset alignment and parent alignment.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetCriteriaFileName(string value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the name of of design check set that is used in the alignment.
         /// Return "" when there is no design check set applied in the current alignment.
         /// </summary>
-        public string DesignCheckSetName
-        {
-            get => AeccAlignment.DesignCheckSetName;
-            set => AeccAlignment.DesignCheckSetName = value;
-        }
+        public string DesignCheckSetName => GetString();
+
+        /// <summary>
+        /// Sets the name of of design check set that is used in the alignment.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetDesignCheckSetName(string value) => SetValue(value);
 
         /// <summary>
         /// Gets the Alignment's start station.
         /// </summary>
-        public double StartingStation => AeccAlignment.StartingStation;
+        public double StartingStation => GetDouble();
 
         /// <summary>
         /// Gets the Alignment's end station.
         /// </summary>
-        public double EndingStation => AeccAlignment.EndingStation;
+        public double EndingStation => GetDouble();
 
         /// <summary>
         /// Gets the Alignment's end station with equations.
         /// </summary>
-        public double EndingStationWithEquations => AeccAlignment.EndingStationWithEquations;
+        public double EndingStationWithEquations => GetDouble();
 
         /// <summary>
         /// Gets whether this Alignment has a Roundabout.
         /// </summary>
-        public bool HasRoundabout => AeccAlignment.HasRoundabout;
+        public bool HasRoundabout => GetBool();
 
         /// <summary>
         /// Gets whether this Alignment is a connected alignment.
         /// </summary>
-        public bool IsConnectedAlignment => AeccAlignment.IsConnectedAlignment;
+        public bool IsConnectedAlignment => GetBool();
 
         /// <summary>
         /// Gets whether this alignment is an offset alignment.
         /// </summary>
-        public bool IsOffsetAlignment => AeccAlignment.IsOffsetAlignment;
+        public bool IsOffsetAlignment => GetBool();
 
         /// <summary>
         /// Gets a bool value that indicates whether this Alignment is a siteless Alignment.
         /// </summary>
-        public bool IsSiteless => AeccAlignment.IsSiteless;
+        public bool IsSiteless => GetBool();
 
         /// <summary>
         /// Gets the Alignment's length.
         /// </summary>
-        public double Length => AeccAlignment.Length;
+        public double Length => GetDouble();
 
         /// <summary>
-        /// Gets or sets the Alignment reference point.
+        /// Gets the Alignment reference point.
         /// </summary>
         public Point ReferencePoint
-        {
-            get => PointData.FromPointObject(AeccAlignment.ReferencePoint).CreateDynamoPoint();
-            set => AeccAlignment.ReferencePoint = new Point2d(value.X, value.Y);
-        }
+            => PointData.FromPointObject(AeccAlignment.ReferencePoint).CreateDynamoPoint();
 
-        struct Tmp
+        /// <summary>
+        /// Sets the Alignment reference point.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetReferencePoint(Point value) => SetValue(new Point2d(value.X, value.Y));
+
+        struct RealStationData
         {
             public C3dDb.Station StationData;
-            public double Station;
+            public double RealStation;
 
-            public Tmp(C3dDb.Alignment alignment, C3dDb.Station data)
+            public RealStationData(C3dDb.Alignment alignment, C3dDb.Station data)
             {
                 StationData = data;
                 double station = 0.0, offset = 0.0;
@@ -122,8 +135,8 @@ namespace IterisCivilDynamo.Alignments
                     data.Location.Y,
                     ref station,
                     ref offset);
-                Station = station;
-            }           
+                RealStation = station;
+            }
         }
 
         /// <summary>
@@ -134,15 +147,16 @@ namespace IterisCivilDynamo.Alignments
             get
             {
                 List<Point2d> piPts = new List<Point2d>();
-                Tmp[] allPIStations = AeccAlignment
+                RealStationData[] allPIStations = AeccAlignment
                     .GetStationSet(C3dDb.StationTypes.PIPoint)
-                    .Select(item => new Tmp(AeccAlignment, item))
+                    .Select(item => new RealStationData(AeccAlignment, item))
                     .ToArray();
 
                 foreach (AlignmentCurve curve in GetCurves())
                 {
                     C3dDb.Station[] curveStats = allPIStations
-                        .Where(item => curve.StartStation <= item.Station && item.Station <= curve.EndStation)
+                        .Where(item => curve.StartStation <= item.RealStation
+                            && item.RealStation <= curve.EndStation)
                         .Select(item => item.StationData)
                         .ToArray();
 
@@ -155,7 +169,8 @@ namespace IterisCivilDynamo.Alignments
                         else
                         {
                             var piStat = curveStats.FirstOrDefault
-                                (item => item.GeometryStationType == C3dDb.AlignmentGeometryPointStationType.PI);
+                                (item => item.GeometryStationType
+                                == C3dDb.AlignmentGeometryPointStationType.PI);
                             if (piStat != null)
                             {
                                 piPts.Add(piStat.Location);
@@ -171,78 +186,97 @@ namespace IterisCivilDynamo.Alignments
         }
 
         /// <summary>
-        /// Gets or sets the Alignment reference point station.
+        /// Gets the Alignment reference point station.
         /// </summary>
-        public double ReferencePointStation
-        {
-            get => AeccAlignment.ReferencePointStation;
-            set => AeccAlignment.ReferencePointStation = value;
-        }
+        public double ReferencePointStation => GetDouble();
+
+        /// <summary>
+        /// Sets the Alignment reference point station.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetReferencePointStation(double value) => SetValue(value);
 
         /// <summary>
         /// Gets the name of the Site to which this Alignment belongs.
         /// a string of "" for a siteless alignment.
         /// </summary>
-        public string SiteName => AeccAlignment.SiteName;
+        public string SiteName => GetString();
 
         /// <summary>
-        /// Gets or sets the Alignment station index increment.
+        /// Gets the Alignment station index increment.
         /// </summary>
-        public double StationIndexIncrement
-        {
-            get => AeccAlignment.StationIndexIncrement;
-            set => AeccAlignment.StationIndexIncrement = value;
-        }
+        public double StationIndexIncrement => GetDouble();
 
         /// <summary>
-        /// Get or sets the Alignment's style name.
+        /// Sets the Alignment station index increment.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetStationIndexIncrement(double value) => SetValue(value);
+
+        /// <summary>
+        /// Get the Alignment's style name.
         /// </summary>
         /// <exception cref="System.ArgumentException">
         /// Thrown when the style name is invalid.
         /// </exception>
-        public string StyleName
-        {
-            get => AeccAlignment.StyleName;
-            set => AeccAlignment.StyleName = value;
-        }
+        public string StyleName => GetString();
 
         /// <summary>
-        /// Gets or sets whether the Alignment uses the design check set.
+        /// Sets the Alignment's style name.
         /// </summary>
-        public bool UseDesignCheckSet
-        {
-            get => AeccAlignment.UseDesignCheckSet;
-            set => AeccAlignment.UseDesignCheckSet = value;
-        }
+        /// <param name="value"></param>
+        public void SetStyleName(string value) => SetValue(value);
 
         /// <summary>
-        /// Gets or sets whether the alignment uses the design criteria file.
+        /// Gets whether the Alignment uses the design check set.
         /// </summary>
-        public bool UseDesignCriteriaFile
-        {
-            get => AeccAlignment.UseDesignCriteriaFile;
-            set => AeccAlignment.UseDesignCriteriaFile = value;
-        }
+        public bool UseDesignCheckSet => GetBool();       
 
         /// <summary>
-        /// Gets or sets a bool value that indicates whether this Alignment uses degign speed.
+        /// Sets whether the Alignment uses the design check set.
         /// </summary>
-        public bool UseDesignSpeed
-        {
-            get => AeccAlignment.UseDesignSpeed;
-            set => AeccAlignment.UseDesignSpeed = value;
-        }
+        /// <param name="value"></param>
+        public void SetUseDesignCheckSet(bool value) => SetValue(value);
+
+        /// <summary>
+        /// Gets whether the alignment uses the design criteria file.
+        /// </summary>
+        public bool UseDesignCriteriaFile => GetBool();
+
+        /// <summary>
+        /// Sets whether the alignment uses the design criteria file.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetUseDesignCriteriaFile(bool value) => SetValue(value);
+
+        /// <summary>
+        /// Gets a bool value that indicates whether this Alignment uses degign speed.
+        /// </summary>
+        public bool UseDesignSpeed => GetBool();
+
+        /// <summary>
+        /// Sets a bool value that indicates whether this Alignment uses degign speed.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetUseDesignSpeed(bool value) => SetValue(value);
 
         /// <summary>
         /// Copies the Alignment to a specified Site. Specifying "" to move it to siteless.
         /// Calling this method copies all children profiles, profile views and sample line
         /// group with this alignment as well.
         /// </summary>
-        /// <param name="siteName">The destination site name.</param>
-        /// <exception cref="System.ArgumentException">Thrown when the Site name is invalid.</exception>
-        public void CopyToSite(string siteName)
+        /// <param name="siteName">The destination site name.</param>       
+        public bool CopyToSite(string siteName)
         {
-            AeccAlignment.CopyToSite(siteName);
+            try
+            {
+                AeccAlignment.CopyToSite(siteName);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -448,12 +482,7 @@ namespace IterisCivilDynamo.Alignments
                 ? GetByObjectId(alignSelRes.ObjectId)
                 : null;
         }
-
-        [IsVisibleInDynamoLibrary(false)]
-        internal static Alignment GetByObjectId(ObjectId alignId)
-            => CivilObjectSupport.Get<Alignment, C3dDb.Alignment>
-                (alignId, (align) => new Alignment(align));
-
+        
         /// <summary>
         /// Gets the geometry points of the alignment
         /// </summary>       

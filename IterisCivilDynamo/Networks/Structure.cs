@@ -1,16 +1,13 @@
-﻿using Autodesk.Civil.DynamoNodes;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.DesignScript.Geometry;
+using Autodesk.DesignScript.Runtime;
 using DynamoServices;
-using C3dDb = Autodesk.Civil.DatabaseServices;
+using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.DesignScript.Runtime;
-using IterisCivilDynamo.Support;
-using Autodesk.DesignScript.Geometry;
-using Autodesk.AutoCAD.Geometry;
+using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Networks
 {
@@ -26,7 +23,7 @@ namespace IterisCivilDynamo.Networks
         {
         }
 
-        [IsVisibleInDynamoLibrary(false)]
+        [SupressImportIntoVM]
         internal static Structure GetByObjectId(ObjectId structId)
             => CivilObjectSupport.Get<Structure, C3dDb.Structure>
                 (structId, (structure) => new Structure(structure));
@@ -35,139 +32,243 @@ namespace IterisCivilDynamo.Networks
         /// Resize the structure by pipe depths.
         /// </summary>
         /// <returns>True if success, false if failed to resize.</returns>
-        public bool ResizeByPipeDepths() => AeccStructure.ResizeByPipeDepths();
+        public bool ResizeByPipeDepths()
+            => AeccStructure.PartType == C3dDb.PartType.StructJunction
+            ? AeccStructure.ResizeByPipeDepths()
+            : false;
 
         /// <summary>
-        /// Gets or sets whether the rim should be automatically adjusted.
+        /// Gets whether the rim should be automatically adjusted.
         /// </summary>
-        public bool AutomaticRimSurfaceAdjustment
-        {
-            get => AeccStructure.AutomaticRimSurfaceAdjustment;
-            set => AeccStructure.AutomaticRimSurfaceAdjustment = value;
-        }
+        public bool AutomaticRimSurfaceAdjustment => GetBool();
 
         /// <summary>
-        /// Gets the clearance of barrel pipe.
+        /// Sets whether the rim should be automatically adjusted.
         /// </summary>
-        public double BarrelPipeClearance => AeccStructure.BarrelPipeClearance;
+        /// <param name="value"></param>
+        public void SetAutomaticRimSurfaceAdjustment(bool value) => SetValue(value);
 
         /// <summary>
         /// Gets the structure bounding shape: Undefined, Cylinder, Box or Sphere
         /// </summary>
-        public string BoundingShape => AeccStructure.BoundingShape.ToString();
+        public string BoundingShape => GetString();
 
         /// <summary>
         /// Gets the count of the pipes connected to the structure.
         /// </summary>
-        public int ConnectedPipesCount => AeccStructure.ConnectedPipesCount;
+        public int ConnectedPipesCount => GetInt();
 
-        ///// <summary>
-        ///// Gets the structure diameter or width.
-        ///// </summary>
-        //public double DiameterOrWidth => AeccStructure.DiameterOrWidth;
+        /// <summary>
+        /// Gets the pipes connected to the structure.
+        /// </summary>
+        /// <returns></returns>
+        public IList<Pipe> GetConnectedPipes()
+        {
+            List<Pipe> conPipes = new List<Pipe>();
+            for (int i = 0; i < ConnectedPipesCount; i++)
+            {
+                ObjectId conPipeId = AeccStructure.get_ConnectedPipe(i);
+                Pipe pipe = Pipe.GetByObjectId(conPipeId);
+                conPipes.Add(pipe);
+            }
+            return conPipes
+                .OrderBy(item => item.InnerDiameterOrWidth)
+                .ToList();
+        }
 
-        ///// <summary>
-        ///// Gets the thickness of the bottom of the structure.
-        ///// </summary>
-        //public double FloorThickness => AeccStructure.FloorThickness;
+        /// <summary>
+        /// Gets the structure size properties.
+        /// </summary>
+        /// <returns></returns>
+        [MultiReturn(new string[]
+        {
+            "InnerDiameterOrWidth",
+            "InnerLength",
+            "DiameterOrWidth",
+            "Length",
+            "WallThickness",
+            "FloorThickness",
+            "VerticalPipeClearance",
+            "BarrelPipeClearance",
+            "ConeHeight",
+            "FrameDiameter",
+            "HeadwallBaseThickness",
+            "HeadwallBaseWidth",
+        })]
+        public Dictionary<string, object> GetSizeProperties()
+        {
+            return new Dictionary<string, object>
+            {
+                { "InnerDiameterOrWidth", GetDouble("InnerDiameterOrWidth") },
+                { "InnerLength" , GetDouble("InnerLength") },
+                { "DiameterOrWidth", GetDouble("DiameterOrWidth") },
+                { "Length", GetDouble("Length") },
+                { "WallThickness", WallThickness },
+                { "FloorThickness", GetDouble("FloorThickness") },
+                { "VerticalPipeClearance", GetDouble("VerticalPipeClearance") },
+                { "BarrelPipeClearance", GetDouble("BarrelPipeClearance") },
+                { "ConeHeight", GetDouble("ConeHeight") },
+                { "FrameDiameter", GetDouble("FrameDiameter") },
+                { "FrameHeight", GetDouble("FrameHeight") },
+                { "HeadwallBaseThickness", GetDouble("HeadwallBaseThickness") },
+                { "HeadwallBaseWidth", GetDouble("HeadwallBaseWidth") },
+            };
+        }
+
+        /// <summary>
+        /// Gets how the sump should be adjusted.
+        /// </summary>
+        public string ControlSumpBy => GetString();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value">True: by depth, false: by elevation</param>
+        public void SetControlSumpByDepth(bool value)
+        {
+            var newVal = value
+                ? C3dDb.StructureControlSumpType.ByDepth
+                : C3dDb.StructureControlSumpType.ByElevation;
+
+            SetValue("ControlSumpBy", newVal);
+        }
+
+        /// <summary>
+        /// Sets how the sump should be adjusted.
+        /// </summary>
+        /// <param name="value">ByDepth or ByElevation</param>
+        public void SetControlSumpBy(string value)
+        {
+            if (Enum.TryParse(value, true, out C3dDb.StructureControlSumpType res))
+            {
+                SetValue(res);
+            }
+        }
+
+        /// <summary>
+        /// Gets the model or type of grate used for a structure intended to be used as a catchbasin.
+        /// </summary>
+        public string Cover => GetString();
+
+        /// <summary>
+        /// Gets the model or type of frame used for a structure.
+        /// </summary>
+        public string Frame => GetString();
+
+        /// <summary>
+        /// Gets the grate of the structure.
+        /// </summary>
+        public string Grate => GetString();
 
         /// <summary>
         /// Gets the structure height.
         /// </summary>
-        public double Height => AeccStructure.Height;
-
-        ///// <summary>
-        ///// Gets the structure inner diameter or width.
-        ///// </summary>
-        //public double InnerDiameterOrWidth => AeccStructure.InnerDiameterOrWidth;
-
-        ///// <summary>
-        ///// Gets the structure inner length.
-        ///// </summary>
-        //public double InnerLength => AeccStructure.InnerLength;
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //public double Length => AeccStructure.Length;
+        public double Height => GetDouble();
 
         /// <summary>
-        /// Gets or sets the location.
+        /// Gets the location.
         /// </summary>
         public Point Location
+            => PointData.FromPointObject(AeccStructure.Location).CreateDynamoPoint();
+
+        /// <summary>
+        /// Sets the location.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetLocation(Point value) => SetValue(new Point3d(value.X, value.Y, value.Z));
+
+        /// <summary>
+        /// Gets the rim elevation.
+        /// </summary>
+        public double RimElevation => GetDouble();
+
+        /// <summary>
+        /// Sets the rim elevation.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetRimElevation(double value)
         {
-            get
-            {
-                return PointData.FromPointObject(AeccStructure.Location).CreateDynamoPoint();
-            }
-            set
-            {
-                AeccStructure.Location = new Point3d(value.X, value.Y, value.Z);
-            }
+            bool old = AutomaticRimSurfaceAdjustment;
+            SetAutomaticRimSurfaceAdjustment(false);
+            SetValue(value);
+            SetAutomaticRimSurfaceAdjustment(old);
         }
 
         /// <summary>
-        /// Gets or sets the rim elevation.
+        /// Gets the distance between the sump to the structure’s rim.
         /// </summary>
-        public double RimElevation
+        public double RimToSumpHeight => GetDouble();
+
+        /// <summary>
+        /// Sets the distance between the sump to the structure’s rim.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetRimToSumpHeight(double value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the structure rotation.
+        /// </summary>
+        public double Rotation => GetDouble();
+
+        /// <summary>
+        /// Sets the structure rotation.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetRotation(double value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the sump depth.
+        /// </summary>
+        public double SumpDepth => GetDouble();
+
+        /// <summary>
+        /// Sets the sump depth.
+        /// </summary>
+        public void SetSumpDepth(double value)
         {
-            get => AeccStructure.RimElevation;
-            set => AeccStructure.RimElevation = value;
+            string old = ControlSumpBy;
+            SetControlSumpByDepth(true);
+            SetValue(value);
+            SetControlSumpBy(old);
         }
 
         /// <summary>
-        /// Gets or sets the distance between the sump to the structure’s rim.
+        /// Gets the sump elevation.
         /// </summary>
-        public double RimToSumpHeight
+        public double SumpElevation => GetDouble();
+
+        /// <summary>
+        /// Sets the sump elevation.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetSumpElevation(double value)
         {
-            get => AeccStructure.RimToSumpHeight;
-            set => AeccStructure.RimToSumpHeight = value;
+            string old = ControlSumpBy;
+            SetControlSumpByDepth(false);
+            SetValue(value);
+            SetControlSumpBy(old);
         }
 
         /// <summary>
-        /// Gets or sets the structure rotation.
+        /// Gets the surface adjustment value.
         /// </summary>
-        public double Rotation
+        public double SurfaceAdjustmentValue => GetDouble();
+
+        /// <summary>
+        /// Sets the surface adjustment value.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetSurfaceAdjustmentValue(double value)
         {
-            get => AeccStructure.Rotation;
-            set => AeccStructure.Rotation = value;
+            bool isOn = AutomaticRimSurfaceAdjustment;
+            SetAutomaticRimSurfaceAdjustment(true);
+            SetValue(value);
+            SetAutomaticRimSurfaceAdjustment(isOn);
         }
 
         /// <summary>
-        /// Gets or sets the sump depth.
+        /// The elevation of the referenced surface at the location of the structure.
         /// </summary>
-        public double SumpDepth
-        {
-            get => AeccStructure.SumpDepth;
-            set => AeccStructure.SumpDepth = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the sump elevation.
-        /// </summary>
-        public double SumpElevation
-        {
-            get => AeccStructure.SumpElevation;
-            set => AeccStructure.SumpElevation = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the surface adjustment value
-        /// </summary>
-        public double SurfaceAdjustmentValue
-        {
-            get => AeccStructure.SurfaceAdjustmentValue;
-            set => AeccStructure.SurfaceAdjustmentValue = value;
-        }
-
-        /// <summary>
-        /// The elevation of the referenced surface at the location of the structure 
-        /// </summary>
-        public double SurfaceElevationAtInsertionPoint
-        {
-            get => AeccStructure.RefSurfaceId.IsValid
-                ? AeccStructure.SurfaceElevationAtInsertionPoint
-                : double.NaN;
-        }
+        public double SurfaceElevationAtInsertionPoint => GetDouble();      
     }
 }

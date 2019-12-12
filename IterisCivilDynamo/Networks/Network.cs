@@ -2,9 +2,9 @@
 using Autodesk.AutoCAD.DynamoApp.Services;
 using Autodesk.AutoCAD.DynamoNodes;
 using Autodesk.Civil.ApplicationServices;
-using Autodesk.Civil.DynamoNodes;
 using Autodesk.DesignScript.Runtime;
 using DynamoServices;
+using IterisCivilDynamo.CivilObjects;
 using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace IterisCivilDynamo.Networks
     /// The Network class
     /// </summary>
     [RegisterForTrace]
-    public sealed class Network : CivilObject
+    public sealed class Network : CivilEntity
     {
         internal C3dDb.Network AeccNetwork => AcObject as C3dDb.Network;
 
@@ -25,7 +25,7 @@ namespace IterisCivilDynamo.Networks
         {
         }
 
-        [IsVisibleInDynamoLibrary(false)]
+        [SupressImportIntoVM]
         internal static Network GetByObjectId(ObjectId networkId)
         => CivilObjectSupport.Get<Network, C3dDb.Network>
                 (networkId, (net) => new Network(net));
@@ -97,13 +97,11 @@ namespace IterisCivilDynamo.Networks
         /// <param name="document">Document</param>
         /// <param name="allowReference">Add referenced networks to result</param>
         /// <returns></returns>
-        public static IList<string> GetAllNetworksNames(Document document, bool allowReference)
-        {
-            return
-                GetNetworks(document, allowReference)
+        public static IList<string> GetAllNetworksNames
+            (Document document, bool allowReference)
+            => GetNetworks(document, allowReference)
                 .Select(item => item.Name)
                 .ToList();
-        }
 
         /// <summary>
         /// Get the network pipes
@@ -143,41 +141,39 @@ namespace IterisCivilDynamo.Networks
                 }
                 return structures;
             }
-        }
+        }        
 
         /// <summary>
-        /// Gets whether the Network is a shortcut object.
-        /// A shortcut object is located in another drawing, and linked using a data shortcut.
-        /// If the entity is native to the current drawing this property returns false;
-        /// if it is being referenced via data shortcuts it returns true.
+        /// Gets the part list name.
         /// </summary>
-        public bool IsShortcut => AeccNetwork.IsReferenceObject || AeccNetwork.IsReferenceSubObject;
+        public string PartsListName => GetString();
 
         /// <summary>
-        /// Gets or sets the part list name.
+        /// Sets the part list name.
         /// </summary>
-        public string PartsListName
-        {
-            get => AeccNetwork.PartsListName;
-            set => AeccNetwork.PartsListName = value;
-        }
+        /// <param name="value"></param>
+        public void SetPartsListName(string value) => SetValue(value);
 
         /// <summary>
-        /// Gets or sets the reference surface name.
+        /// Gets the reference surface name.
         /// </summary>
-        public string ReferenceSurfaceName
-        {
-            get => AeccNetwork.ReferenceSurfaceName;
-            set => AeccNetwork.ReferenceSurfaceName = value;
-        }
+        public string ReferenceSurfaceName => GetString();
 
         /// <summary>
-        /// Gets or sets the reference alignment name.
+        /// Sets the reference surface name.
         /// </summary>
-        public string ReferenceAlignmentName
-        {
-            get => AeccNetwork.ReferenceAlignmentName;
-            set => ReferenceAlignmentName = value;
-        }
+        /// <param name="value"></param>
+        public void SetReferenceSurfaceName(string value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the reference alignment name.
+        /// </summary>
+        public string ReferenceAlignmentName => GetString();
+
+        /// <summary>
+        /// Sets the reference alignment name.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetReferenceAlignmentName(string value) => SetValue(value);
     }
 }

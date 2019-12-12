@@ -7,7 +7,7 @@ namespace IterisCivilDynamo.Alignments
     /// <summary>
     /// Base object for not-linear alignment curve
     /// </summary>
-    [IsVisibleInDynamoLibrary(false)]
+    [SupressImportIntoVM]
     public abstract class AlignmentNotLinearCurve : AlignmentCurve
     {
         /// <summary>

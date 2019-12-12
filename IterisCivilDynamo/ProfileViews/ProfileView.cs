@@ -1,10 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.Civil.DynamoNodes;
 using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
 using DynamoServices;
+using IterisCivilDynamo.CivilObjects;
 using IterisCivilDynamo.Support;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace IterisCivilDynamo.ProfileViews
     /// Profile view data
     /// </summary>
     [RegisterForTrace]
-    public sealed class ProfileView : CivilObject
+    public sealed class ProfileView : CivilEntity
     {
         private readonly ObjectId AlignmentId;
 
@@ -31,47 +30,45 @@ namespace IterisCivilDynamo.ProfileViews
             AlignmentName = pView.AlignmentName;
         }
 
+        [SupressImportIntoVM]
+        internal static ProfileView GetByObjectId(ObjectId structId)
+            => CivilObjectSupport.Get<ProfileView, C3dProfileView>
+                (structId, (pView) => new ProfileView(pView));
+
         /// <summary>
         /// Gets the location of the profile view.
         /// </summary>
-        public Point Location
-        {
-            get
-            {
-                Point3d location = PView.Location;
-                return Point.ByCoordinates
-                    (location.X, location.Y, location.Z);
-            }
-        }
+        public Point Location => PointData.FromPointObject(PView.Location).CreateDynamoPoint();       
 
         /// <summary>
         /// Gets the minimum elevation of the profile view.
         /// </summary>
-        public double ElevationMin => PView.ElevationMin;
+        public double ElevationMin => GetDouble();
 
         /// <summary>
         /// Gets the maximum elevation of the profile view.
         /// </summary>
-        public double ElevationMax => PView.ElevationMax;
+        public double ElevationMax => GetDouble();
 
         /// <summary>
         /// Gets the start station of the profile view.
         /// </summary>
-        public double StationStart => PView.StationStart;
+        public double StationStart => GetDouble();
 
         /// <summary>
         /// Gets the end station of the profile view.
         /// </summary>
-        public double StationEnd => PView.StationEnd;
+        public double StationEnd => GetDouble();
 
         /// <summary>
-        /// Gets or sets the ProfileView's style by name.
+        /// Gets the ProfileView's style by name.
         /// </summary>
-        public string StyleName
-        {
-            get => PView.StyleName;
-            set => PView.StyleName = value;
-        }
+        public string StyleName => GetString();
+
+        /// <summary>
+        /// sets the ProfileView's style by name.
+        /// </summary>
+        public void SetStyleName(string value) => SetValue(value);
 
         /// <summary>
         /// Gets the alignment from which the profile view was created.
@@ -89,7 +86,7 @@ namespace IterisCivilDynamo.ProfileViews
         /// <remarks>
         /// Automatic or UserSpecified
         /// </remarks>
-        public string ElevationRangeMode => PView.ElevationRangeMode.ToString();
+        public string ElevationRangeMode => GetString();
 
         /// <summary>
         /// Select a profile view on drawing
@@ -107,7 +104,7 @@ namespace IterisCivilDynamo.ProfileViews
             PromptEntityResult selRes = ed.GetEntity(selOpt);
             if (selRes.Status != PromptStatus.OK) return null;
 
-            return Get(selRes.ObjectId);
+            return GetByObjectId(selRes.ObjectId);
         }
 
         /// <summary>
@@ -130,7 +127,7 @@ namespace IterisCivilDynamo.ProfileViews
                     || pViewId.IsErased
                     || pViewId.IsEffectivelyErased) continue;
 
-                ProfileView pView = Get(pViewId);               
+                ProfileView pView = GetByObjectId(pViewId);               
                 ret.Add(pView);
             }
 
@@ -186,11 +183,6 @@ namespace IterisCivilDynamo.ProfileViews
                 { "Elevation", elevation },
                 { "IsOnPView", isOn }
             };
-        }
-
-        static ProfileView Get(ObjectId pViewId)
-            => CivilObjectSupport
-            .Get<ProfileView, C3dProfileView>
-            (pViewId, (pV) => new ProfileView(pV));
+        }        
     }
 }

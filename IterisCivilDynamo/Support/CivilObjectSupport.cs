@@ -8,7 +8,7 @@ using AeccEntity = Autodesk.Civil.DatabaseServices.Entity;
 
 namespace IterisCivilDynamo.Support
 {
-    [IsVisibleInDynamoLibrary(false)]
+    [SupressImportIntoVM]
     internal static class CivilObjectSupport
     {
         public static T Get<T, U>(ObjectId id, Func<U,T> creator)
@@ -30,6 +30,6 @@ namespace IterisCivilDynamo.Support
             {
                 throw new InvalidOperationException("Object is referenced and cannot be changed!");
             }
-        }
+        }        
     }
 }

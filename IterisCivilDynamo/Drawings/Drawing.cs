@@ -14,6 +14,5 @@ namespace IterisCivilDynamo.Drawings
         /// </summary>
         public static double CurrentScaleFactor
             => 1 / (double)AcApplication.GetSystemVariable("cannoscalevalue");
-
     }
 }

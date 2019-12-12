@@ -7,7 +7,7 @@ namespace IterisCivilDynamo.Support
     /// <summary>
     /// Support methods for use reflection
     /// </summary>
-    [IsVisibleInDynamoLibrary(false)]
+    [SupressImportIntoVM]
     internal static class ReflectionSupport
     {
         /// <summary>

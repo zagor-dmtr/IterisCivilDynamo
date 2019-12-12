@@ -4,6 +4,7 @@ using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
 using DynamoServices;
 using IterisCivilDynamo.Support;
+using System.Collections.Generic;
 using C3dDb = Autodesk.Civil.DatabaseServices;
 
 namespace IterisCivilDynamo.Networks
@@ -20,7 +21,7 @@ namespace IterisCivilDynamo.Networks
         {
         }
 
-        [IsVisibleInDynamoLibrary(false)]
+        [SupressImportIntoVM]
         internal static Pipe GetByObjectId(ObjectId pipeId)
             => CivilObjectSupport.Get<Pipe, C3dDb.Pipe>
                 (pipeId, (pipe) => new Pipe(pipe));
@@ -28,60 +29,69 @@ namespace IterisCivilDynamo.Networks
         /// <summary>
         /// Gets the end point's cover of pipe.
         /// </summary>
-        public double CoverOfEndpoint => AeccPipe.CoverOfEndpoint;
+        public double CoverOfEndpoint => GetDouble();
 
         /// <summary>
         /// Gets the start point's cover of pipe.
         /// </summary>
-        public double CoverOfStartPoint => AeccPipe.CoverOfStartPoint;
+        public double CoverOfStartPoint => GetDouble();
 
         /// <summary>
         /// Gets the pipe’s cross sectional shape, such as circular, egg-shaped, elliptical, or rectangular.
         /// </summary>
-        public string CrossSectionalShape => AeccPipe.CrossSectionalShape.ToString();
+        public string CrossSectionalShape => GetString();
 
         /// <summary>
         /// Gets the offset of the starting point for the pipe object.
         /// </summary>
-        public double StartOffset => AeccPipe.StartOffset;
+        public double StartOffset => GetDouble();
 
         /// <summary>
-        /// Gets or sets the startpoint of the Pipe.
+        /// Gets the startpoint of the Pipe.
         /// </summary>
         public Point StartPoint
-        {
-            get => PointData.FromPointObject(AeccPipe.StartPoint).CreateDynamoPoint();
-            set => AeccPipe.StartPoint = new Point3d(value.X, value.Y, value.Z);
-        }
+            => PointData.FromPointObject(AeccPipe.StartPoint).CreateDynamoPoint();
+
+        /// <summary>
+        /// Sets the startpoint of the Pipe.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetStartPoint(Point value)
+            => SetValue(new Point3d(value.X, value.Y, value.Z));
 
         /// <summary>
         /// Gets the station of the starting point for the pipe object.
         /// </summary>
-        public double StartStation => AeccPipe.StartStation;
+        public double StartStation => GetDouble();
 
         /// <summary>
         /// Gets the start structure of the Pipe. If no connected structure, return Null.
         /// </summary>
-        public Structure StartStructure => Structure.GetByObjectId(AeccPipe.StartStructureId);
+        public Structure StartStructure
+            => Structure.GetByObjectId(AeccPipe.StartStructureId);
 
         /// <summary>
         /// Gets the offset of the ending point for the pipe object.
         /// </summary>
-        public double EndOffset => AeccPipe.EndOffset;
+        public double EndOffset => GetDouble();
 
         /// <summary>
-        /// Gets or sets the endpoint of the Pipe.
+        /// Gets the endpoint of the Pipe.
         /// </summary>
         public Point EndPoint
-        {
-            get => PointData.FromPointObject(AeccPipe.EndPoint).CreateDynamoPoint();
-            set => AeccPipe.EndPoint = new Point3d(value.X, value.Y, value.Z);
-        }
+            => PointData.FromPointObject(AeccPipe.EndPoint).CreateDynamoPoint();
+
+        /// <summary>
+        /// Sets the endpoint of the Pipe.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetEndPoint(Point value)
+            => SetValue(new Point3d(value.X, value.Y, value.Z));
 
         /// <summary>
         /// Gets the station of the ending point for the pipe object.
         /// </summary>
-        public double EndStation => AeccPipe.EndStation;
+        public double EndStation => GetDouble();
 
         /// <summary>
         /// Gets the end structure of the Pipe. If no connected structure, return Null.
@@ -89,64 +99,199 @@ namespace IterisCivilDynamo.Networks
         public Structure EndStructure => Structure.GetByObjectId(AeccPipe.EndStructureId);
 
         /// <summary>
+        /// Gets the pipe flow rate.
+        /// </summary>
+        public double FlowRate => GetDouble();        
+
+        /// <summary>
+        /// Sets the pipe flow rate.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetFlowRate(double value) => SetValue(value);
+
+        /// <summary>
+        /// Gets how pipe should hold when resized.
+        /// </summary>
+        public string HoldOnResizeType => GetString();
+
+        /// <summary>
+        /// Sets how pipe should hold when resized.
+        /// </summary>
+        /// <param name="value">0 - invert, 1 - crown, 2 - centerline</param>
+        public void SetHoldOnResizeType(int value)
+            => SetValue((C3dDb.HoldOnResizeType)value);
+
+        /// <summary>
+        /// Gets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        public double EnergyGradeLineDown => GetDouble();
+
+        /// <summary>
+        /// Sets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetEnergyGradeLineDown(double value)
+            => SetValue(value);
+
+        /// <summary>
+        /// Gets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        public double EnergyGradeLineUp => GetDouble();
+
+        /// <summary>
+        /// Sets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetEnergyGradeLineUp(double value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        public double HydraulicGradeLineDown => GetDouble();
+
+        /// <summary>
+        /// Sets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetHydraulicGradeLineDown(double value) => SetValue(value);
+
+        /// <summary>
+        /// Gets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        public double HydraulicGradeLineUp => GetDouble();
+
+        /// <summary>
+        /// Sets the elevation of the hydraulic grade line for pipe
+        /// networks flowing in a downstream direction and that contain
+        /// hydraulic property data.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetHydraulicGradeLineUp(double value) => SetValue(value);
+
+        /// <summary>
         /// Gets the inner diameter or inner width of the pipe.
         /// </summary>
-        public double InnerDiameterOrWidth => AeccPipe.InnerDiameterOrWidth;
+        public double InnerDiameterOrWidth => GetDouble();
 
         /// <summary>
         /// Gets the inner height of the pipe in drawing units.
         /// </summary>
-        public double InnerHeight => AeccPipe.InnerHeight;
+        public double InnerHeight => GetDouble();
 
         /// <summary>
         /// Gets the outer diameter or outer width of the pipe.
         /// </summary>
-        public double OuterDiameterOrWidth => AeccPipe.OuterDiameterOrWidth;
+        public double OuterDiameterOrWidth => GetDouble();
 
         /// <summary>
         /// Gets the outer height of the pipe in drawing units.
         /// </summary>
-        public double OuterHeight => AeccPipe.OuterHeight;
+        public double OuterHeight => GetDouble();
+
+        /// <summary>
+        /// Gets the pipe size properties.
+        /// </summary>
+        /// <returns></returns>
+        [MultiReturn(new string[]
+        {
+            "InnerDiameterOrWidth",
+            "InnerHeight",
+            "OuterDiameterOrWidth",
+            "OuterHeight",
+            "Radius"
+        })]
+        public Dictionary<string, object> GetSizeProperties()
+        {
+            return new Dictionary<string, object>
+            {
+                { "InnerDiameterOrWidth", InnerDiameterOrWidth },
+                { "InnerHeight", InnerHeight },
+                { "OuterDiameterOrWidth", OuterDiameterOrWidth },
+                { "OuterHeight", OuterHeight },
+                { "Radius", Radius },
+            };
+        }
+
+        /// <summary>
+        /// Gets the pipe junction loss.
+        /// </summary>
+        public double JunctionLoss => GetDouble();
+
+        /// <summary>
+        /// Sets the pipe junction loss.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetJunctionLoss(double value) => SetValue(value);
 
         /// <summary>
         /// Gets the two-dimensional length of the pipe, measured from the center of the
         /// connected starting structure to the center of the connected ending structure.
         /// </summary>
-        public double Length2DCenterToCenter => AeccPipe.Length2DCenterToCenter;
+        public double Length2DCenterToCenter => GetDouble();
 
         /// <summary>
         /// Gets the two-dimensional length of the pipe, measured from the inside edge of the
         /// connected starting structure to the inside edge of the connected ending structure.
         /// </summary>
-        public double Length2DToInsideEdge => AeccPipe.Length2DToInsideEdge;
+        public double Length2DToInsideEdge => GetDouble();
 
         /// <summary>
         /// Gets the three-dimensional length of the pipe, measured from the center of the
         /// connected starting structure to the center of the connected ending structure.
         /// </summary>
-        public double Length3DCenterToCenter => AeccPipe.Length3DCenterToCenter;
+        public double Length3DCenterToCenter => GetDouble();
 
         /// <summary>
         /// Gets the three-dimensional length of the pipe,measured from the inside edge of the
         /// connected starting structure to the inside edge of the connected ending structure.
         /// </summary>
-        public double Length3DToInsideEdge => AeccPipe.Length3DToInsideEdge;
+        public double Length3DToInsideEdge => GetDouble();
 
         /// <summary>
         /// Gets the maximum depth of cover along the entire length of pipe, from
         /// the top outside of the pipe to the reference surface.
         /// </summary>
-        public double MaximumCover => AeccPipe.MaximumCover;
+        public double MaximumCover => GetDouble();
 
         /// <summary>
         /// Gets the minimum depth of cover along the entire length of pipe, from
         /// the top outside of the pipe to the reference surface.
         /// </summary>
-        public double MinimumCover => AeccPipe.MinimumCover;
+        public double MinimumCover => GetDouble();
+
+        /// <summary>
+        /// Gets the radius of the pipe.
+        /// </summary>
+        public double Radius => GetDouble();
+
+        /// <summary>
+        /// Gets the pipe return period.
+        /// </summary>
+        public int ReturnPeriod => GetInt();
+
+        /// <summary>
+        /// Sets the pipe return period.
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetReturnPeriod(int value) => SetValue(value);
 
         /// <summary>
         /// Gets the pipe’s slope in absolute value.
         /// </summary>
-        public double Slope => AeccPipe.Slope;
+        public double Slope => GetDouble();
     }
 }

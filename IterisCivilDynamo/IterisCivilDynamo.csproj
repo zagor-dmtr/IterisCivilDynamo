@@ -114,6 +114,7 @@
     <Compile Include="ProfileViews\ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\CivilObjectSupport.cs" />
+    <Compile Include="CivilObjects\CivilEntity.cs" />
     <Compile Include="Support\PointData.cs" />
     <Compile Include="Support\ReflectionSupport.cs" />
   </ItemGroup>

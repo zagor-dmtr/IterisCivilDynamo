@@ -7,7 +7,7 @@ namespace IterisCivilDynamo.Support
     /// <summary>
     /// Data for point coordinates
     /// </summary>
-    [IsVisibleInDynamoLibrary(false)]
+    [SupressImportIntoVM]
     internal struct PointData
     {
         /// <summary>
