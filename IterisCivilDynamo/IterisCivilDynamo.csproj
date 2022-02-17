@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IterisCivilDynamo</RootNamespace>
     <AssemblyName>IterisCivilDynamo</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,50 +36,6 @@
     <DocumentationFile>bin\Release\IterisCivilDynamo.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AcCoreMgd">
-      <HintPath>..\..\..\..\..\SDK\AutoCAD\ObjectARX 2020\inc\AcCoreMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AcDbMgd">
-      <HintPath>..\..\..\..\..\SDK\AutoCAD\ObjectARX 2020\inc\AcDbMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AcDynamoServices">
-      <HintPath>..\..\..\..\..\SDK\AcDynamo\2020\AcDynamoServices.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AcMgd">
-      <HintPath>..\..\..\..\..\SDK\AutoCAD\ObjectARX 2020\inc\AcMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AecBaseMgd">
-      <HintPath>..\..\..\..\..\SDK\AutoCAD Civil\Civil 2020\managed-x64\AecBaseMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AeccDbMgd">
-      <HintPath>..\..\..\..\..\SDK\AutoCAD Civil\Civil 2020\managed-x64\AeccDbMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AeccDynamo">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2020\C3D\AeccDynamo.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AutoCADNodes">
-      <HintPath>..\..\..\..\..\SDK\AcDynamo\2020\AutoCADNodes.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Civil3DNodes">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2020\C3D\Dynamo\Civil3DNodes.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DynamoServices">
-      <HintPath>..\..\..\..\..\SDK\AcDynamo\2020\DynamoServices.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ProtoGeometry">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2020\C3D\Dynamo\Core\ProtoGeometry.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -119,9 +76,14 @@
     <Compile Include="Support\ReflectionSupport.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\Dmitriy\AppData\Roaming\Autodesk\C3D 2020\Dynamo\2.4\packages\IterisCivilDynamo\pkg.json">
-      <Link>pkg.json</Link>
-    </None>
+    <PackageReference Include="AutoCAD2021.Base" Version="1.0.0" ExcludeAssets="build; runtime" />
+    <PackageReference Include="Civil3D2021.Base" Version="1.0.0" ExcludeAssets="build; runtime" />
+    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.13.1.3887" />
+    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="2.13.1.3887" />
+    <PackageReference Include="Civil3dDynamoSdk2021" Version="1.0.0" ExcludeAssets="build; runtime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="pkg.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

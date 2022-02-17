@@ -14,7 +14,7 @@ namespace IterisCivilDynamo.Networks
     /// </summary>
     [RegisterForTrace]
     public abstract class Part : CivilEntity
-    { 
+    {
         internal C3dDb.Part AeccPart => AcObject as C3dDb.Part;
 
         internal Part(C3dDb.Entity entity, bool isDynamoOwned = false)
@@ -35,7 +35,6 @@ namespace IterisCivilDynamo.Networks
         /// <summary>
         /// Gets the network to which this part belongs
         /// </summary>
-        /// <returns></returns>
         public Network Network => Network.GetByObjectId(AeccPart.NetworkId);
 
         /// <summary>
@@ -43,8 +42,8 @@ namespace IterisCivilDynamo.Networks
         /// </summary>
         public string PartSizeName
             => AeccPart.PartType != C3dDb.PartType.StructNull
-            ? GetString()
-            : "Null Structure";
+                ? GetString()
+                : "Null Structure";
 
         /// <summary>
         /// Gets the part’s subtype.
@@ -110,7 +109,5 @@ namespace IterisCivilDynamo.Networks
         /// Gets the wall thickness for this part
         /// </summary>
         public double WallThickness => GetDouble();
-
-       
     }
 }
